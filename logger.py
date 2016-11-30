@@ -2,12 +2,11 @@
 
 from datetime import datetime
 import sqlite3
+import settings
 
 
 class Logger:
     """Log sensor data"""
-
-    db_file = 'database'
 
     db_fields = [
         ('date', 'DATETIME'),
@@ -52,7 +51,7 @@ class Logger:
 
     def __init__(self):
         assert self.db_date_field in self.db_fields_names
-        self.db_conn = sqlite3.connect(self.db_file)
+        self.db_conn = sqlite3.connect(settings.DATABASE_PATH)
         self.commit('CREATE TABLE IF NOT EXISTS data (' + self.db_table_cols_decl + ')')
 
     def __del__(self):
