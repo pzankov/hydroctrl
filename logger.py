@@ -6,66 +6,78 @@ import settings
 
 
 class Logger:
-    """Log sensor data"""
+    """SQLite data logger"""
 
-    db_fields = [
+    table_spec = (
         ('date', 'DATETIME'),
         ('temp_C', 'REAL'),
         ('pH', 'REAL'),
         ('volume_L', 'REAL'),
         ('nutes_mL', 'REAL'),
-        ]
+    )
 
-    db_date_field = 'date'
+    table_date_col = None
 
-    db_conn = None
+    conn = None
 
     @staticmethod
     def datefmt():
+        """Date and time format used in DB"""
         return '%Y-%m-%d %H:%M:%S'
 
     @staticmethod
     def now():
+        """Get current date and time in DB format"""
         return datetime.now().strftime(Logger.datefmt())
 
     @property
-    def db_fields_names(self):
-        return (f[0] for f in self.db_fields)
+    def table_cols(self):
+        """List of table columns"""
+        return (f[0] for f in self.table_spec)
 
     @property
-    def db_table_cols_decl(self):
-        return ', '.join(f[0] + ' ' + f[1] for f in self.db_fields)
+    def sql_table_spec(self):
+        """Sting to be used in SQL query"""
+        return ', '.join(f[0] + ' ' + f[1] for f in self.table_spec)
 
     @property
-    def db_table_cols(self):
-        return ', '.join(self.db_fields_names)
+    def sql_table_cols(self):
+        """Sting to be used in SQL query"""
+        return ', '.join(self.table_cols)
 
     @property
-    def db_table_vals(self):
-        return ', '.join(':' + f for f in self.db_fields_names)
+    def sql_table_vals(self):
+        """Sting to be used in SQL query"""
+        return ', '.join(':' + f for f in self.table_cols)
 
     def commit(self, *args):
+        """Execute and commit a query"""
         print(*args)
         self.db_conn.cursor().execute(*args)
         self.db_conn.commit()
 
     def __init__(self):
-        assert self.db_date_field in self.db_fields_names
+        # Find column which will hold date
+        datetime_cols = [f[0] for f in self.table_spec if f[1] == 'DATETIME']
+        assert len(datetime_cols) == 1
+        self.table_date_col = datetime_cols[0]
+
+        # Create DB
         self.db_conn = sqlite3.connect(settings.DATABASE_PATH)
-        self.commit('CREATE TABLE IF NOT EXISTS data (' + self.db_table_cols_decl + ')')
+        self.commit('CREATE TABLE IF NOT EXISTS data (' + self.sql_table_spec + ')')
 
     def __del__(self):
         self.db_conn.close()
 
-    def add_missing_values(self, data):
-        """Update data with missing default values"""
+    def update_defaults(self, data):
+        """Update defaults for the missing column values"""
 
-        # Set default values
-        values = {f: 0 for f in self.db_fields_names}
-        values[self.db_date_field] = Logger.now()
+        # Create default values
+        values = {f: 0 for f in self.table_cols}
+        values[self.table_date_col] = Logger.now()
 
-        # Make sure data contains only known fields
-        # (to avoid mistakes when field is not saved in DB)
+        # Make sure original data contains values only for known columns.
+        # This ensures all values will be saved to DB.
         for key in data.keys():
             if key not in values.keys():
                 raise Exception('Unknown field: ' + key)
@@ -74,9 +86,10 @@ class Logger:
         return values
 
     def log(self, data):
-        values = self.add_missing_values(data)
-        self.commit('INSERT INTO data (' + self.db_table_cols + ')' +
-                    ' VALUES (' + self.db_table_vals + ')', values)
+        """Save data to DB. Data must be a dictionary of table columns."""
+        values = self.update_defaults(data)
+        self.commit('INSERT INTO data (' + self.sql_table_cols + ')' +
+                    ' VALUES (' + self.sql_table_vals + ')', values)
 
 
 def main():
