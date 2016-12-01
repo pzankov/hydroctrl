@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import settings
+import smbus
 
 
 class PHTheory:
@@ -77,18 +78,21 @@ class ADCInterface:
     Read ADC voltage.
     """
 
+    i2c = None
+
     @staticmethod
     def value_to_voltage(value):
         return float(value) * settings.PH_ADC_REF_V / (1 << settings.PH_ADC_BITS)
 
-    @staticmethod
-    def get_value():
-        # TODO: read from I2C bus
-        return (1 << settings.PH_ADC_BITS) / 2
+    def __init__(self):
+        self.i2c = smbus.SMBus(settings.PH_ADC_I2C_BUSN)
 
-    @staticmethod
-    def get_voltage():
-        value = ADCInterface.get_value()
+    def get_value(self):
+        reading = self.i2c.read_i2c_block_data(settings.PH_ADC_I2C_ADDR, 0x00, 2)
+        return (reading[0] << 8) + reading[1]
+
+    def get_voltage(self):
+        value = self.get_value()
         return ADCInterface.value_to_voltage(value)
 
 
@@ -98,19 +102,21 @@ class PHInterface:
     calibration and temperature compensation.
     """
 
+    adc = None
     calibration = None
 
     def __init__(self):
+        self.adc = ADCInterface()
         self.calibration = PHCalibration()
 
     def get_ph(self, temp):
-        v = ADCInterface.get_voltage()
+        v = self.adc.get_voltage()
         return self.calibration.compute_ph(temp, v)
 
 
 def main():
     ph = PHInterface()
-    print(ph.get_ph(25))
+    print("%.2f" % ph.get_ph(25))
 
 
 if __name__ == "__main__":
