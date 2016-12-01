@@ -44,3 +44,47 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
   - fresh water consumption meter
   - nutrient pump
 
+# Raspberry Pi setup
+
+- Installation and basic setup
+  - dd [Raspbian image](https://www.raspberrypi.org/downloads/raspbian/) to SD flash
+  - Create file with name `ssh` on boot partition
+  - Connect Pi to the ethernet cable and power it on
+  - Discover raspberry with `arp -a`
+  - Connect via ssh with user `pi` and password `raspberry`
+  - `sudo aptitude install vim`
+  - `sudo vi /etc/wpa_supplicant/wpa_supplicant.conf`, then add
+
+    ```
+    network={
+    ssid="SSID"
+    psk="WIFI PASSWORD"
+    }
+    ```
+
+  - `sudo raspi-config`
+    - Expand Filesystem
+    - Boot Options
+      - Choose Console for Desktop / CLI
+      - Disable Wait for Network at Boot
+    - Advanced Options
+      - Enable SPI
+      - Enable I2C
+  - `sudo aptitude update && sudo aptitude upgrade`
+  - `vi .ssh/authorized_keys` and paste your public ssh key
+  - `sudo usermod --lock pi` (disable login with password)
+  - `sudo dpkg-reconfigure tzdata` (set time zone)
+  - `sudo vi /etc/network/interfaces` and add `wireless-power off` for `wlan0`, then make sure power management is off in `iwconfig` after reboot
+- Dev tools
+  - `sudo aptitude install vim-python-jedi`
+  - `vim-addons install python-jedi`
+  - `sudo aptitude install git tig`
+  - `sudo aptitude install fish`
+  - take vim/git/fish config from [this repo](https://github.com/pzankov/cfg)
+  - `sudo vi /etc/locale.gen` and uncomment `en_US.UTF-8`, then `sudo locale-gen`
+  - `sudo aptitude install ipython3`
+  - `sudo aptitude install time`
+  - `sudo aptitude install sqlite3`
+- Runtime
+  - `sudo aptitude install python3 python3-smbus python3-arrow`
+
