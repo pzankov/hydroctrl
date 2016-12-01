@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from datetime import datetime
+import arrow
 import sqlite3
 import settings
 
@@ -21,14 +21,9 @@ class Logger:
     conn = None
 
     @staticmethod
-    def datefmt():
-        """Date and time format used in DB"""
-        return '%Y-%m-%d %H:%M:%S'
-
-    @staticmethod
     def now():
-        """Get current date and time in DB format"""
-        return datetime.now().strftime(Logger.datefmt())
+        """Get UTC date and time in ISO 8601 format"""
+        return str(arrow.utcnow())
 
     @property
     def table_cols(self):
