@@ -75,7 +75,7 @@ class PHCalibration:
 
 class ADCInterface:
     """
-    Read ADC voltage.
+    MCP3221 interface.
     """
 
     i2c = None
