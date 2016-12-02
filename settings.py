@@ -13,3 +13,6 @@ PH_CALIBRATION = {
         {'ph': 7.0, 'v': 1.5}
     )
 }
+
+TEMP_SPI_BUSN = 0
+TEMP_SPI_DEVN = 0
