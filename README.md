@@ -86,5 +86,5 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
   - `sudo aptitude install time`
   - `sudo aptitude install sqlite3`
 - Runtime
-  - `sudo aptitude install python3 python3-smbus python3-arrow`
+  - `sudo aptitude install python3 python3-smbus python3-arrow python3-spidev`
 
