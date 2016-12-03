@@ -75,6 +75,36 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
   - `sudo usermod --lock pi` (disable login with password)
   - `sudo dpkg-reconfigure tzdata` (set time zone)
   - `sudo vi /etc/network/interfaces` and add `wireless-power off` for `wlan0`, then make sure power management is off in `iwconfig` after reboot
+- Switch to readonly FS
+  - follow [these instructions](https://hallard.me/raspberry-pi-read-only/)
+  - add `chmod 1777 /tmp` to `/etc/rc.local`
+  - add `set viminfo="/tmp/viminfo"` to `.vimrc`
+- Use separate partition for the database
+  - Create new partition
+
+    ```
+    e2fsck -f /dev/mmcblk0p2
+    resize2fs /dev/mmcblk0p2 8G
+    fdisk /dev/mmcblk0
+      delete partition 2
+      create partition 2 starting after partition 1 with size +8.4G
+      create partition 3 starting after partition 2 with size +16G
+      save changes
+    mkfs.ext4 /dev/mmcblk0p3
+    tune2fs -L system /dev/mmcblk0p2
+    tune2fs -L database /dev/mmcblk0p3
+    ```
+
+  - Setup new partition
+
+    ```
+    echo '/dev/mmcblk0p3  /mnt/database   ext4    defaults,noatime     0       1' >> /etc/fstab
+    mkdir /mnt/database
+    mount /mnt/database
+    mkdir /mnt/database/storage
+    chmod 1777 /mnt/database/storage
+    ```
+
 - Dev tools
   - `sudo aptitude install vim-python-jedi`
   - `vim-addons install python-jedi`
