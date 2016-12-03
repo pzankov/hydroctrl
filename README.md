@@ -52,8 +52,8 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
   - Connect Pi to the ethernet cable and power it on
   - Discover raspberry with `arp -a`
   - Connect via ssh with user `pi` and password `raspberry`
-  - `sudo aptitude install vim`
-  - `sudo vi /etc/wpa_supplicant/wpa_supplicant.conf`, then add
+  - `aptitude install vim`
+  - `vi /etc/wpa_supplicant/wpa_supplicant.conf`, then add
 
     ```
     network={
@@ -62,7 +62,7 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
     }
     ```
 
-  - `sudo raspi-config`
+  - `raspi-config`
     - Expand Filesystem
     - Boot Options
       - Choose Console for Desktop / CLI
@@ -70,11 +70,11 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
     - Advanced Options
       - Enable SPI
       - Enable I2C
-  - `sudo aptitude update && sudo aptitude upgrade`
+  - `aptitude update && aptitude upgrade`
   - `vi .ssh/authorized_keys` and paste your public ssh key
-  - `sudo usermod --lock pi` (disable login with password)
-  - `sudo dpkg-reconfigure tzdata` (set time zone)
-  - `sudo vi /etc/network/interfaces` and add `wireless-power off` for `wlan0`, then make sure power management is off in `iwconfig` after reboot
+  - `usermod --lock pi` (disable login with password)
+  - `dpkg-reconfigure tzdata` (set time zone)
+  - `vi /etc/network/interfaces` and add `wireless-power off` for `wlan0`, then make sure power management is off in `iwconfig` after reboot
 - Switch to readonly FS
   - follow [these instructions](https://hallard.me/raspberry-pi-read-only/)
   - add `chmod 1777 /tmp` to `/etc/rc.local`
@@ -106,15 +106,15 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
     ```
 
 - Dev tools
-  - `sudo aptitude install vim-python-jedi`
+  - `aptitude install vim-python-jedi`
   - `vim-addons install python-jedi`
-  - `sudo aptitude install git tig`
-  - `sudo aptitude install fish`
+  - `aptitude install git tig`
+  - `aptitude install fish`
   - take vim/git/fish config from [this repo](https://github.com/pzankov/cfg)
-  - `sudo vi /etc/locale.gen` and uncomment `en_US.UTF-8`, then `sudo locale-gen`
-  - `sudo aptitude install ipython3`
-  - `sudo aptitude install time`
-  - `sudo aptitude install sqlite3`
+  - `vi /etc/locale.gen` and uncomment `en_US.UTF-8`, then `locale-gen`
+  - `aptitude install ipython3`
+  - `aptitude install time`
+  - `aptitude install sqlite3`
 - Runtime
-  - `sudo aptitude install python3 python3-smbus python3-arrow python3-spidev python3-rpi.gpio`
+  - `aptitude install python3 python3-smbus python3-arrow python3-spidev python3-rpi.gpio`
 
