@@ -1,4 +1,4 @@
-DATABASE_PATH = 'database'
+DATABASE_PATH = '/mnt/database/storage/db'
 
 PH_ADC_I2C_BUSN = 1
 PH_ADC_I2C_ADDR = 0x4F
