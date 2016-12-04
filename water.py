@@ -9,7 +9,7 @@ import settings
 
 class DistanceInterface:
     """
-    Ultrasonic distance meter JSN-SR04T
+    Ultrasonic distance meter JSN-SR04T.
     """
 
     def __init__(self):
@@ -17,10 +17,10 @@ class DistanceInterface:
 
         GPIO.setmode(GPIO.BCM)
 
-        GPIO.setup(settings.DIST_GPIO_TRIG, GPIO.OUT)
-        GPIO.setup(settings.DIST_GPIO_ECHO, GPIO.IN)
+        GPIO.setup(settings.DISTANCE_GPIO_TRIG, GPIO.OUT)
+        GPIO.setup(settings.DISTANCE_GPIO_ECHO, GPIO.IN)
 
-        GPIO.output(settings.DIST_GPIO_TRIG, False)
+        GPIO.output(settings.DISTANCE_GPIO_TRIG, False)
         time.sleep(warmup_time)
 
     def __del__(self):
@@ -36,20 +36,20 @@ class DistanceInterface:
         # Normally less than 5000 iterations are needed
         poll_cycle_limit = 10 * 1000
 
-        GPIO.output(settings.DIST_GPIO_TRIG, True)
+        GPIO.output(settings.DISTANCE_GPIO_TRIG, True)
         time.sleep(trig_hold_time)
-        GPIO.output(settings.DIST_GPIO_TRIG, False)
+        GPIO.output(settings.DISTANCE_GPIO_TRIG, False)
 
         start = None
         end = None
 
         for t in range(0, poll_cycle_limit):
-            if GPIO.input(settings.DIST_GPIO_ECHO) == 1:
+            if GPIO.input(settings.DISTANCE_GPIO_ECHO) == 1:
                 start = time.time()
                 break
 
         for t in range(0, poll_cycle_limit):
-            if GPIO.input(settings.DIST_GPIO_ECHO) == 0:
+            if GPIO.input(settings.DISTANCE_GPIO_ECHO) == 0:
                 end = time.time()
                 break
 
