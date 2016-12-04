@@ -9,12 +9,15 @@ class TemperatureInterface:
     MAX6675 interface.
     """
 
+    # Limit frequency
+    spi_frequency = 100e3
+
     spi = None
 
     def __init__(self):
         self.spi = spidev.SpiDev()
         self.spi.open(settings.TEMPERATURE_SPI_BUSN, settings.TEMPERATURE_SPI_DEVN)
-        self.spi.max_speed_hz = 100 * 1000
+        self.spi.max_speed_hz = int(self.spi_frequency)
 
     def get_temp(self):
         bytes = self.spi.readbytes(2)
