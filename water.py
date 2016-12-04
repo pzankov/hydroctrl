@@ -12,43 +12,46 @@ class DistanceInterface:
     Ultrasonic distance meter JSN-SR04T.
     """
 
-    def __init__(self):
-        warmup_time = 0.1
+    sound_speed = 343.21  # at 20 C
 
+    # Must be enough to finish send-receive sequence
+    warmup_time = 0.1
+
+    # Sensor properties
+    trig_hold_time = 10e-6
+    dist_min = 0.23
+    dist_max = 4
+
+    # Limit polling loop iterations, this is faster than comparing time.
+    # Normally less than 5000 iterations are needed.
+    poll_cycle_limit = 10 * 1000
+
+    def __init__(self):
         GPIO.setmode(GPIO.BCM)
 
         GPIO.setup(settings.DISTANCE_GPIO_TRIG, GPIO.OUT)
         GPIO.setup(settings.DISTANCE_GPIO_ECHO, GPIO.IN)
 
         GPIO.output(settings.DISTANCE_GPIO_TRIG, False)
-        time.sleep(warmup_time)
+        time.sleep(self.warmup_time)
 
     def __del__(self):
         GPIO.cleanup()
 
     def get_distance(self):
-        trig_hold_time = 10e-6
-        sound_speed = 343.21
-        dist_min = 0.23
-        dist_max = 2
-
-        # Limit polling loop iterations, this is faster than comparing time
-        # Normally less than 5000 iterations are needed
-        poll_cycle_limit = 10 * 1000
-
         GPIO.output(settings.DISTANCE_GPIO_TRIG, True)
-        time.sleep(trig_hold_time)
+        time.sleep(self.trig_hold_time)
         GPIO.output(settings.DISTANCE_GPIO_TRIG, False)
 
         start = None
         end = None
 
-        for t in range(0, poll_cycle_limit):
+        for t in range(0, self.poll_cycle_limit):
             if GPIO.input(settings.DISTANCE_GPIO_ECHO) == 1:
                 start = time.time()
                 break
 
-        for t in range(0, poll_cycle_limit):
+        for t in range(0, self.poll_cycle_limit):
             if GPIO.input(settings.DISTANCE_GPIO_ECHO) == 0:
                 end = time.time()
                 break
@@ -56,9 +59,9 @@ class DistanceInterface:
         if start is None or end is None:
             return 0
 
-        dist = (end - start) * sound_speed / 2
+        dist = (end - start) * self.sound_speed / 2
 
-        if dist < dist_min or dist > dist_max:
+        if dist < self.dist_min or dist > self.dist_max:
             return 0
 
         return dist
@@ -74,8 +77,10 @@ class WaterTankCalibration:
     def __init__(self):
         xy = [(p['distance'], p['volume']) for p in settings.WATER_TANK_CALIBRATION['points']]
         xy = sorted(xy, key=lambda p: p[0])
+
         x = np.array([p[0] for p in xy])
         y = np.array([p[1] for p in xy])
+
         self.tck = interpolate.splrep(x, y, s=0, k=2)
 
     def get_volume(self, distance):
