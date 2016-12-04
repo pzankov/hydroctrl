@@ -13,7 +13,7 @@ class TemperatureInterface:
 
     def __init__(self):
         self.spi = spidev.SpiDev()
-        self.spi.open(settings.TEMP_SPI_BUSN, settings.TEMP_SPI_DEVN)
+        self.spi.open(settings.TEMPERATURE_SPI_BUSN, settings.TEMPERATURE_SPI_DEVN)
         self.spi.max_speed_hz = 100 * 1000
 
     def get_temp(self):
