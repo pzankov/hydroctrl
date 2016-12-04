@@ -19,3 +19,9 @@ TEMP_SPI_DEVN = 0
 
 DIST_GPIO_TRIG = 23
 DIST_GPIO_ECHO = 24
+
+WATER_TANK_CALIBRATION = (
+    {'distance': 0.8, 'volume': 0},
+    {'distance': 0.5, 'volume': 150},
+    {'distance': 0.25, 'volume': 300},
+)

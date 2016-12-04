@@ -2,6 +2,8 @@
 
 import RPi.GPIO as GPIO
 import time
+import numpy as np
+from scipy import interpolate
 import settings
 
 
@@ -62,9 +64,53 @@ class DistanceInterface:
         return dist
 
 
+class WaterTankCalibration:
+    """
+    Convert water depth/height into volume.
+    """
+
+    tck = None
+
+    def __init__(self):
+        xy = [(p['distance'], p['volume']) for p in settings.WATER_TANK_CALIBRATION]
+        xy = sorted(xy, key=lambda p: p[0])
+        x = np.array([p[0] for p in xy])
+        y = np.array([p[1] for p in xy])
+        self.tck = interpolate.splrep(x, y, s=0, k=2)
+
+    def get_volume(self, distance):
+        x = np.array([distance])
+        y = interpolate.splev(x, self.tck, der=0)
+        return y[0]
+
+
+class WaterTankInterface:
+    """
+    Complete water tank interface with calibration.
+    """
+
+    distanceInterface = None
+    calibration = None
+
+    def __init__(self):
+        self.distanceInterface = DistanceInterface()
+        self.calibration = WaterTankCalibration()
+
+    def get_volume(self):
+        distance = self.distanceInterface.get_distance()
+        if distance == 0:
+            return 0
+
+        volume = self.calibration.get_volume(distance)
+        if volume < 0:
+            return 0
+
+        return volume
+
+
 def main():
-    d = DistanceInterface()
-    print("%3.1f" % (d.get_distance() * 100))
+    tank = WaterTankInterface()
+    print("%5.1f" % tank.get_volume())
 
 
 if __name__ == "__main__":
