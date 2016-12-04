@@ -1,3 +1,11 @@
+"""
+Unless otherwise stated, following units are used in this project:
+- length: metre
+- volume: litre
+- temperature: Celsius degree
+- voltage: Volt
+"""
+
 DATABASE_PATH = '/mnt/database/storage/db'
 
 PH_ADC_I2C_BUSN = 1
