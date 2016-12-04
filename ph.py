@@ -82,7 +82,8 @@ class ADCInterface:
 
     @staticmethod
     def value_to_voltage(value):
-        return float(value) * settings.PH_ADC_REF_V / (1 << settings.PH_ADC_BITS)
+        adc_bits = 12
+        return float(value) * settings.PH_ADC_REF_V / (1 << adc_bits)
 
     def __init__(self):
         self.i2c = smbus.SMBus(settings.PH_ADC_I2C_BUSN)
