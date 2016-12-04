@@ -50,19 +50,19 @@ class PHCalibration:
 
         point1 = settings.PH_CALIBRATION['points'][0]
         point2 = settings.PH_CALIBRATION['points'][1]
-        temp = settings.PH_CALIBRATION['temp']
+        temp = settings.PH_CALIBRATION['temperature']
 
         self.slope = PHTheory.compute_slope(
             temp,
-            point1['ph'], point1['v'],
-            point2['ph'], point2['v'])
+            point1['ph'], point1['voltage'],
+            point2['ph'], point2['voltage'])
 
         if abs(self.slope - 1) > 0.2:
             raise Exception('pH slope %.2f is out of range, consider replacing the electrode' % self.slope)
 
         self.offset = PHTheory.compute_offset(
             temp, self.slope,
-            point1['ph'], point1['v'])
+            point1['ph'], point1['voltage'])
 
         if abs(self.offset - settings.PH_ADC_REF_V / 2) > settings.PH_ADC_REF_V * 0.1:
             raise Exception('pH offset %.3f is out of range' % self.offset)
