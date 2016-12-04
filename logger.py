@@ -10,10 +10,10 @@ class Logger:
 
     table_spec = (
         ('date', 'DATETIME'),
-        ('temp_C', 'REAL'),
+        ('temperature_C', 'REAL'),
         ('pH', 'REAL'),
         ('volume_L', 'REAL'),
-        ('nutes_mL', 'REAL'),
+        ('nutrients_mL', 'REAL'),
     )
 
     table_date_col = None
@@ -89,7 +89,7 @@ class Logger:
 
 def main():
     l = Logger()
-    l.log({'temp_C': 15, 'volume_L': 250})
+    l.log({'temperature_C': 15, 'volume_L': 250})
 
 
 if __name__ == "__main__":
