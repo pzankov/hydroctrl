@@ -72,7 +72,7 @@ class WaterTankCalibration:
     tck = None
 
     def __init__(self):
-        xy = [(p['distance'], p['volume']) for p in settings.WATER_TANK_CALIBRATION]
+        xy = [(p['distance'], p['volume']) for p in settings.WATER_TANK_CALIBRATION['points']]
         xy = sorted(xy, key=lambda p: p[0])
         x = np.array([p[0] for p in xy])
         y = np.array([p[1] for p in xy])
