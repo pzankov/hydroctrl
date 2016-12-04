@@ -24,3 +24,9 @@ WATER_TANK_CALIBRATION = (
     {'distance': 0.5, 'volume': 150},
     {'distance': 0.25, 'volume': 300},
 )
+
+PUMP_GPIO_STEP = 27
+
+PUMP_CALIBRATION = {
+    'steps_per_litre': 1.6e6
+}
