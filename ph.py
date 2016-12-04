@@ -15,10 +15,13 @@ class PHTheory:
     @staticmethod
     def ideal_slope(temp):
         """Slope of the ideal pH electrode, in V/pH"""
+
+        # Properties of this Universe
         gas_const = 8.3144
         faraday_const = 96485
         abs_zero_temp = -273.15
         ln_10 = 2.3026
+
         return gas_const * (temp - abs_zero_temp) * ln_10 / faraday_const
 
     @staticmethod
@@ -41,6 +44,7 @@ class PHCalibration:
     Parse calibration data.
     """
 
+    # Calibration data
     slope = None
     offset = None
 
@@ -78,12 +82,11 @@ class ADCInterface:
     MCP3221 interface.
     """
 
+    adc_bits = 12
     i2c = None
 
-    @staticmethod
-    def value_to_voltage(value):
-        adc_bits = 12
-        return float(value) * settings.PH_ADC_REF_V / (1 << adc_bits)
+    def value_to_voltage(self, value):
+        return float(value) * settings.PH_ADC_REF_V / (1 << self.adc_bits)
 
     def __init__(self):
         self.i2c = smbus.SMBus(settings.PH_ADC_I2C_BUSN)
@@ -94,7 +97,7 @@ class ADCInterface:
 
     def get_voltage(self):
         value = self.get_value()
-        return ADCInterface.value_to_voltage(value)
+        return self.value_to_voltage(value)
 
 
 class PHInterface:
