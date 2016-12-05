@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import arrow
+from datetime import datetime
 import sqlite3
 import settings
 
@@ -23,7 +23,7 @@ class Logger:
     @staticmethod
     def now():
         """Get UTC date and time in ISO 8601 format"""
-        return str(arrow.utcnow())
+        return datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
 
     @property
     def table_cols(self):

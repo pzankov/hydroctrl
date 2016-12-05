@@ -116,4 +116,4 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
   - `aptitude install time`
   - `aptitude install sqlite3`
 - Runtime
-  - `aptitude install python3 python3-smbus python3-arrow python3-spidev python3-rpi.gpio python3-scipy`
+  - `aptitude install python3 python3-smbus python3-spidev python3-rpi.gpio python3-scipy`
