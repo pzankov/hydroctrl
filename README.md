@@ -80,7 +80,7 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
   - add `chmod 1777 /tmp` to `/etc/rc.local`
   - add `set viminfo="/tmp/viminfo"` to `.vimrc`
 - Use separate partition for the database
-  - Create new partition
+  - Resize root and create a new partition
 
     ```
     e2fsck -f /dev/mmcblk0p2
@@ -98,7 +98,7 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
   - Setup new partition
 
     ```
-    echo '/dev/mmcblk0p3  /mnt/database   ext4    defaults,noatime     0       1' >> /etc/fstab
+    echo '/dev/mmcblk0p3  /mnt/database   ext4    defaults,noatime     0       3' >> /etc/fstab
     mkdir /mnt/database
     mount /mnt/database
     mkdir /mnt/database/storage
