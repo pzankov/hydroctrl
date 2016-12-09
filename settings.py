@@ -39,5 +39,5 @@ PUMP_GPIO_SLEEP = 17
 PUMP_GPIO_STEP = 27
 
 PUMP_CALIBRATION = {
-    'steps_per_litre': 1.6e6
+    'steps_per_litre': 8.4e6
 }

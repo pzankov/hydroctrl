@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import sys
 import RPi.GPIO as GPIO
 import time
 import settings
@@ -11,7 +12,7 @@ class PumpInterface:
     """
 
     # Pump properties
-    max_rpm = 30
+    max_rpm = 180
     step_angle = 1.8
 
     # Driver properties
@@ -58,10 +59,9 @@ class PumpInterface:
 
 
 def main():
+    ml = float(sys.argv[1])
     p = PumpInterface()
-    while True:
-        p.pump(1e-3)
-        time.sleep(1)
+    p.pump(ml / 1e3)
 
 
 if __name__ == "__main__":
