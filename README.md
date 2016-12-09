@@ -28,9 +28,9 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
 - MAX6675 SPI thermocouple interface
 - K type thermocouple
 - JSN-SR04T waterproof ultrasonic distance sensor (fresh water consumption meter)
-- TXS0104 bidirectional voltage level converter
-- Easy Driver stepper motor driver by [Brian Schmalz](http://www.schmalzhaus.com/EasyDriver/)
+- Logic level converter 3.3V-5V (to connect ultrasonic distance sensor)
 - Peristaltic pump with stepper motor (nutrient pump)
+- Easy Driver stepper motor driver by [Brian Schmalz](http://www.schmalzhaus.com/EasyDriver/)
 - DC-DC step down converter 12V to 5V 5A
 - 12V power supply
 
@@ -44,7 +44,7 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
   - fresh water consumption meter
   - nutrient pump
 
-# Raspberry Pi setup
+# Software setup
 
 - Installation and basic setup
   - dd [Raspbian image](https://www.raspberrypi.org/downloads/raspbian/) to SD flash
@@ -117,3 +117,7 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
   - `aptitude install sqlite3`
 - Runtime
   - `aptitude install python3 python3-smbus python3-spidev python3-rpi.gpio python3-scipy`
+
+# Hardware setup
+
+- Make sure peristaltic pump properly compresses the pipe in all rotor positions. In my case, pipe holder had to be tightened to prevent free liquid flow in some positions.
