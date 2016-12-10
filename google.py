@@ -14,6 +14,8 @@ class GoogleSheet:
     Connection is recreated for each sheet access to avoid timeout issues.
 
     A copy of sheet contents is kept in memory.
+    All values are read at object creation.
+    It takes 1 minute to obtain 20k rows on Raspberry Pi 3.
     """
 
     def __init__(self):
