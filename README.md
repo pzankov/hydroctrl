@@ -98,7 +98,7 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
   - add `chmod 1777 /tmp` to `/etc/rc.local`
   - add `set viminfo="/tmp/viminfo"` to `.vimrc`
 - Runtime
-  - `aptitude install python3 python3-smbus python3-spidev python3-rpi.gpio python3-scipy python3-pip ntpstat`
+  - `aptitude install python3 python3-smbus python3-spidev python3-rpi.gpio python3-scipy python3-pip`
   - `pip3 install gspread oauth2client`
   - create a thingspeak channel with same fields as in `settings.DATA_SPEC` (skip the `date` field).
   Save the channel's write api key to `thingspeak_key.txt`.

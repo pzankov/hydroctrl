@@ -15,21 +15,21 @@ def log(msg):
 
 def wait_for_ntp():
     """
-    Wait until NTP becomes synchronised.
-    NOTE: It make take up to 15min for the NTP status to become synchronised.
+    Wait until NTP selects a peer.
     """
 
+    log('Waiting for NTP, press Ctrl+C to skip')
     try:
-        log('Waiting for NTP to synchronize, press Ctrl+C to skip')
         while True:
-            code = subprocess.call('ntpstat')
-            if code == 0:
-                break
-            log('Waiting for NTP to synchronise')
-            time.sleep(60)
+            output = subprocess.check_output(['ntpq', '-pn'])
+            lines = output.splitlines()[2:]  # skip header lines
+            for l in lines:
+                if l[0] == ord('*'):  # sync peer is labelled with a star
+                    return
+            log('Waiting for NTP')
+            time.sleep(5)
     except KeyboardInterrupt:
         log('NTP status check skipped')
-        pass
 
 
 class Controller:
