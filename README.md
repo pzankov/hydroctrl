@@ -55,6 +55,11 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
   - fresh water consumption meter
   - nutrient pump
 
+# Hardware setup
+
+- Make sure peristaltic pump properly compresses the pipe in all rotor positions.
+In my case, pipe holder had to be tightened to prevent free liquid flow in some positions.
+
 # Software setup
 
 - Installation and basic setup
@@ -92,16 +97,6 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
   - `aptitude purge fake-hwclock`
   - add `chmod 1777 /tmp` to `/etc/rc.local`
   - add `set viminfo="/tmp/viminfo"` to `.vimrc`
-- Dev tools
-  - `aptitude install vim-python-jedi`
-  - `vim-addons install python-jedi`
-  - `aptitude install git tig`
-  - `aptitude install fish`
-  - take vim/git/fish config from [this repo](https://github.com/pzankov/cfg)
-  - `vi /etc/locale.gen` and uncomment `en_US.UTF-8`, then `locale-gen`
-  - `aptitude install ipython3`
-  - `aptitude install time`
-  - `aptitude install wcalc`
 - Runtime
   - `aptitude install python3 python3-smbus python3-spidev python3-rpi.gpio python3-scipy python3-pip ntpstat`
   - `pip3 install gspread oauth2client`
@@ -112,8 +107,22 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
   - obtain google credentials for [gspread](https://github.com/burnash/gspread) as described [here](http://gspread.readthedocs.io/en/latest/oauth2.html).
   Don't forget to share the spreadsheet with an email in `json_key['client_email']`.
   Save credentials to `google_key.json`.
+  - finally, add `su -c /path/to/controller.py pi &` to `/etc/rc.local`
 
-# Hardware setup
+# Dev tools
 
-- Make sure peristaltic pump properly compresses the pipe in all rotor positions.
-In my case, pipe holder had to be tightened to prevent free liquid flow in some positions.
+## Software
+
+  - `aptitude install git tig`
+  - `aptitude install vim-python-jedi`
+  - `vim-addons install python-jedi`
+  - `aptitude install fish`
+  - take vim/git/fish config from [this repo](https://github.com/pzankov/cfg)
+  - `vi /etc/locale.gen` and uncomment `en_US.UTF-8`, then `locale-gen`
+  - `aptitude install ipython3`
+  - `aptitude install time`
+  - `aptitude install wcalc`
+
+## Notes
+
+Use `logread` to see syslog messages.
