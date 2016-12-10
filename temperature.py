@@ -12,8 +12,6 @@ class TemperatureInterface:
     # Limit frequency
     spi_frequency = 100e3
 
-    spi = None
-
     def __init__(self):
         self.spi = spidev.SpiDev()
         self.spi.open(settings.TEMPERATURE_SPI_BUSN, settings.TEMPERATURE_SPI_DEVN)

@@ -19,9 +19,6 @@ class PumpInterface:
     wake_up_time = 1e-3
     microsteps = 8
 
-    # Calibration data
-    steps_per_litre = None
-
     @property
     def max_step_frequency(self):
         max_rotation_frequency = float(self.max_rpm) / 60

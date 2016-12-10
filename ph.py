@@ -44,10 +44,6 @@ class PHCalibration:
     Parse calibration data.
     """
 
-    # Calibration data
-    slope = None
-    offset = None
-
     def __init__(self):
         # Two point calibration only
         assert len(settings.PH_CALIBRATION['points']) == 2
@@ -83,7 +79,6 @@ class ADCInterface:
     """
 
     adc_bits = 12
-    i2c = None
 
     def value_to_voltage(self, value):
         return float(value) * settings.PH_ADC_REF_V / (1 << self.adc_bits)
@@ -105,9 +100,6 @@ class PHInterface:
     Complete pH electrode interface with
     calibration and temperature compensation.
     """
-
-    adc = None
-    calibration = None
 
     def __init__(self):
         self.adc = ADCInterface()

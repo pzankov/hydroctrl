@@ -72,8 +72,6 @@ class WaterTankCalibration:
     Convert water depth/height into volume.
     """
 
-    tck = None
-
     def __init__(self):
         xy = [(p['distance'], p['volume']) for p in settings.WATER_TANK_CALIBRATION['points']]
         xy = sorted(xy, key=lambda p: p[0])
@@ -93,9 +91,6 @@ class WaterTankInterface:
     """
     Complete water tank interface with calibration.
     """
-
-    distanceInterface = None
-    calibration = None
 
     def __init__(self):
         self.distanceInterface = DistanceInterface()
