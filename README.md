@@ -89,6 +89,7 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
   then make sure power management is off in `iwconfig` after reboot
 - Switch to readonly FS
   - follow [these instructions](https://hallard.me/raspberry-pi-read-only/)
+  - `aptitude purge fake-hwclock`
   - add `chmod 1777 /tmp` to `/etc/rc.local`
   - add `set viminfo="/tmp/viminfo"` to `.vimrc`
 - Dev tools
@@ -102,7 +103,7 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
   - `aptitude install time`
   - `aptitude install wcalc`
 - Runtime
-  - `aptitude install python3 python3-smbus python3-spidev python3-rpi.gpio python3-scipy python3-pip`
+  - `aptitude install python3 python3-smbus python3-spidev python3-rpi.gpio python3-scipy python3-pip ntpstat`
   - `pip3 install gspread oauth2client`
   - create a thingspeak channel with same fields as in `settings.DATA_SPEC` (skip the `date` field).
   Save the channel's write api key to `thingspeak_key.txt`.
