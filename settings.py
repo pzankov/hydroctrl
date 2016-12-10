@@ -6,7 +6,14 @@ Unless otherwise stated, following units are used in this project:
 - voltage: Volt
 """
 
-DATABASE_PATH = '/mnt/database/storage/db'
+# Specify order and name of data columns
+DATA_SPEC = (
+    'date',
+    'temperature_C',
+    'pH',
+    'volume_L',
+    'nutrients_mL'
+)
 
 PH_ADC_I2C_BUSN = 1
 PH_ADC_I2C_ADDR = 0x4F

@@ -1,10 +1,12 @@
 # Hydroponic nutrient solution controller
 
-This is a repo of the nutrient solution controller. The goal is to continuously monitor and ajust the solution state.
+This is a repo of the nutrient solution controller.
+The goal is to continuously monitor and adjust the solution state.
 
 # Hydroponic system
 
-Recirculating hydroponic system consists of a single tank which is used to both mix and hold the solution. Solution consumed by plants is continuously replaced with a fresh water (through a float valve).
+Recirculating hydroponic system consists of a single tank which is used to both mix and hold the solution.
+Solution consumed by plants is continuously replaced with a fresh water (through a float valve).
 
 # Sensors
 
@@ -13,16 +15,25 @@ Following data will be obtained by the controller:
 - pH of solution
 - consumption of fresh water (to detect leaks)
 
+# Data storage
+
+All sensor readings are stored online in a Google sheet.
+
+In order to simplify monitoring, sensor readings are also uploaded to the Thingspeak service.
+Data from Thingspeak can be easily viewed with a mobile app.
+
 # Regulation
 
-When consumed solution is replaced with a fresh water it is usually enough to adjust pH by addition of new nutrients. EC value usually stays within an acceptable range.
+When consumed solution is replaced with a fresh water it is usually enough to adjust pH by addition of new nutrients.
+EC value usually stays within an acceptable range.
 
 Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
 
 # Hardware
 
 - Raspberry Pi
-- MinipH pH interface by [Sparky's Widgets](https://www.sparkyswidgets.com/product/miniph/) (note: voltage reference IC has to be soldered manually)
+- MinipH pH interface by [Sparky's Widgets](https://www.sparkyswidgets.com/product/miniph/)
+  (note: voltage reference IC has to be soldered manually)
 - I2C opto isolation by [Sparky's Widgets](https://www.sparkyswidgets.com/product/i2c-isolation-breakout/)
 - pH electrode with BNC plug
 - MAX6675 SPI thermocouple interface
@@ -74,37 +85,12 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
   - `vi .ssh/authorized_keys` and paste your public ssh key
   - `usermod --lock pi` (disable login with password)
   - `dpkg-reconfigure tzdata` (set time zone)
-  - `vi /etc/network/interfaces` and add `wireless-power off` for `wlan0`, then make sure power management is off in `iwconfig` after reboot
+  - `vi /etc/network/interfaces` and add `wireless-power off` for `wlan0`,
+  then make sure power management is off in `iwconfig` after reboot
 - Switch to readonly FS
   - follow [these instructions](https://hallard.me/raspberry-pi-read-only/)
   - add `chmod 1777 /tmp` to `/etc/rc.local`
   - add `set viminfo="/tmp/viminfo"` to `.vimrc`
-- Use separate partition for the database
-  - Resize root and create a new partition
-
-    ```
-    e2fsck -f /dev/mmcblk0p2
-    resize2fs /dev/mmcblk0p2 8G
-    fdisk /dev/mmcblk0
-      delete partition 2
-      create partition 2 starting after partition 1 with size +8.4G
-      create partition 3 starting after partition 2 with size +16G
-      save changes
-    mkfs.ext4 /dev/mmcblk0p3
-    tune2fs -L system /dev/mmcblk0p2
-    tune2fs -L database /dev/mmcblk0p3
-    ```
-
-  - Setup new partition
-
-    ```
-    echo '/dev/mmcblk0p3  /mnt/database   ext4    defaults,noatime     0       3' >> /etc/fstab
-    mkdir /mnt/database
-    mount /mnt/database
-    mkdir /mnt/database/storage
-    chmod 1777 /mnt/database/storage
-    ```
-
 - Dev tools
   - `aptitude install vim-python-jedi`
   - `vim-addons install python-jedi`
@@ -114,10 +100,19 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
   - `vi /etc/locale.gen` and uncomment `en_US.UTF-8`, then `locale-gen`
   - `aptitude install ipython3`
   - `aptitude install time`
-  - `aptitude install sqlite3`
+  - `aptitude install wcalc`
 - Runtime
-  - `aptitude install python3 python3-smbus python3-spidev python3-rpi.gpio python3-scipy`
+  - `aptitude install python3 python3-smbus python3-spidev python3-rpi.gpio python3-scipy python3-pip`
+  - `pip3 install gspread oauth2client`
+  - create a thingspeak channel with same fields as in `settings.DATA_SPEC` (skip the `date` field).
+  Save the channel's write api key to `thingspeak_key.txt`.
+  - create a google spreadsheet and remove all rows but the first one.
+  Save spreadsheet ID to `google_sheet_id.txt`.
+  - obtain google credentials for [gspread](https://github.com/burnash/gspread) as described [here](http://gspread.readthedocs.io/en/latest/oauth2.html).
+  Don't forget to share the spreadsheet with an email in `json_key['client_email']`.
+  Save credentials to `google_key.json`.
 
 # Hardware setup
 
-- Make sure peristaltic pump properly compresses the pipe in all rotor positions. In my case, pipe holder had to be tightened to prevent free liquid flow in some positions.
+- Make sure peristaltic pump properly compresses the pipe in all rotor positions.
+In my case, pipe holder had to be tightened to prevent free liquid flow in some positions.

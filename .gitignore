@@ -1,3 +1,7 @@
+thingspeak_key.txt
+google_key.json
+google_sheet_id.txt
 .idea
+.venv*
 __pycache__
 database
