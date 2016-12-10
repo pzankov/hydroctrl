@@ -41,7 +41,8 @@ class GoogleSheet:
         self.values.append(values)
 
     def append(self, data):
-        assert len(data) == len(settings.DATA_SPEC)
+        if len(data) != len(settings.DATA_SPEC):
+            raise Exception('Invalid data fields count')
         values = [data[k] for k in settings.DATA_SPEC]
         self._append_row(values)
 
