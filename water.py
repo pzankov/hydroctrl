@@ -23,7 +23,7 @@ class DistanceInterface:
     dist_max = 4
 
     # Limit polling loop iterations, this is faster than comparing time.
-    # Normally less than 5000 iterations are needed.
+    # Looping speed is limited by GPIO speed. Normally less than 5000 iterations are needed.
     poll_cycle_limit = 10 * 1000
 
     def __init__(self):
@@ -56,13 +56,16 @@ class DistanceInterface:
                 end = time.time()
                 break
 
-        if start is None or end is None:
-            return 0
+        if start is None:
+            raise Exception('Could not detect echo start')
+
+        if end is None:
+            raise Exception('Could not detect echo end')
 
         dist = (end - start) * self.sound_speed / 2
 
         if dist < self.dist_min or dist > self.dist_max:
-            return 0
+            raise Exception('Distance is out of range')
 
         return dist
 
@@ -98,8 +101,6 @@ class WaterTankInterface:
 
     def get_volume(self):
         distance = self.distanceInterface.get_distance()
-        if distance == 0:
-            return 0
 
         volume = self.calibration.get_volume(distance)
         if volume < 0:
