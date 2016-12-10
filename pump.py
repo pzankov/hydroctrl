@@ -61,5 +61,5 @@ def main():
     p.pump(ml / 1e3)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

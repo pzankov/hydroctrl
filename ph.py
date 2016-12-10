@@ -118,8 +118,8 @@ class PHInterface:
 
 def main():
     ph = PHInterface()
-    print("%.2f" % ph.get_ph(25))
+    print('%.2f' % ph.get_ph(25))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

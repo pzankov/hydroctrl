@@ -111,8 +111,8 @@ class WaterTankInterface:
 
 def main():
     tank = WaterTankInterface()
-    print("%5.1f" % tank.get_volume())
+    print('%5.1f' % tank.get_volume())
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
