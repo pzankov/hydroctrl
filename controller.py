@@ -10,7 +10,7 @@ from thingspeak import Thingspeak
 
 def log(msg):
     print(msg)
-    syslog.syslog('hydroctrl: ' + msg)
+    syslog.syslog(msg)
 
 
 def wait_for_ntp():
@@ -78,6 +78,8 @@ class Controller:
 
 
 def main():
+    syslog.openlog('hydroctrl')
+
     while True:
         try:
             ctrl = Controller()
