@@ -23,7 +23,7 @@ class TemperatureInterface:
 
         thermocouple_status = word & (1 << 2)
         if thermocouple_status != 0:
-            return 0
+            raise Exception('Thermocouple is not connected')
 
         temperature = (word >> 3) / 4.0
         return temperature
