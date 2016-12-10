@@ -16,6 +16,10 @@ class PHTheory:
     def ideal_slope(temp):
         """Slope of the ideal pH electrode, in V/pH"""
 
+        # To be sure value is valid
+        if temp < 0 or temp > 100:
+            raise Exception('Temperature is out of range')
+
         # Properties of this Universe
         gas_const = 8.3144
         faraday_const = 96485
@@ -45,8 +49,8 @@ class PHCalibration:
     """
 
     def __init__(self):
-        # Two point calibration only
-        assert len(settings.PH_CALIBRATION['points']) == 2
+        if len(settings.PH_CALIBRATION['points']) != 2:
+            raise Exception('Only two point calibration is supported')
 
         point1 = settings.PH_CALIBRATION['points'][0]
         point2 = settings.PH_CALIBRATION['points'][1]
@@ -57,6 +61,7 @@ class PHCalibration:
             point1['ph'], point1['voltage'],
             point2['ph'], point2['voltage'])
 
+        # Slope drifts away as electrode degrades
         if abs(self.slope - 1) > 0.2:
             raise Exception('pH slope %.2f is out of range, consider replacing the electrode' % self.slope)
 
@@ -64,10 +69,11 @@ class PHCalibration:
             temp, self.slope,
             point1['ph'], point1['voltage'])
 
+        # Assume Voffset = Vref / 2
         if abs(self.offset - settings.PH_ADC_REF_V / 2) > settings.PH_ADC_REF_V * 0.1:
             raise Exception('pH offset %.3f is out of range' % self.offset)
 
-        print('pH slope %.2f offset %.3f' % (self.slope, self.offset))
+        print('pH slope %.2f, offset %.3f' % (self.slope, self.offset))
 
     def compute_ph(self, temp, v):
         return PHTheory.compute_ph(temp, self.offset, self.slope, v)
