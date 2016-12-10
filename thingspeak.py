@@ -4,12 +4,13 @@ import urllib.request
 import urllib.parse
 import urllib.error
 from os import path
+from datetime import datetime
 import settings
 
 
 class Thingspeak:
     """
-    Log data to the thingspeak channel.
+    Log data to the Thingspeak channel.
     """
 
     def __init__(self):
@@ -20,14 +21,17 @@ class Thingspeak:
             self.key = f.read().strip()
 
     def append(self, data):
+        if len(data) != len(settings.DATA_SPEC):
+            raise Exception('Invalid data fields count')
+
         values = {
-            'api_key': self.key
+            'api_key': self.key,
+            'created_at': data['date']
         }
 
-        assert len(data) == len(settings.DATA_SPEC)
         count = 1
         for k in settings.DATA_SPEC:
-            if k != 'date':  # skip the date field
+            if k != 'date':
                 values['field' + str(count)] = data[k]
                 count += 1
 
@@ -37,19 +41,20 @@ class Thingspeak:
 
         try:
             response = urllib.request.urlopen(req)
-            html_string = response.read()
+            response_data = response.read()
             response.close()
+            if response_data == b'0':
+                raise Exception('Update failed')
         except urllib.error.HTTPError as e:
             print('Server could not fulfill the request: ' + e.code)
         except urllib.error.URLError as e:
             print('Failed to reach server: ' + e.reason)
-        except Exception as e:
-            print('Unknown error: ' + str(e))
 
 
 def main():
     t = Thingspeak()
-    t.append({'date': None, 'temperature_C': 25, 'pH': 6.0, 'volume_L': 250, 'nutrients_mL': 0})
+    date = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+    t.append({'date': date, 'temperature_C': 25, 'pH': 6.0, 'volume_L': 250, 'nutrients_mL': 0})
 
 
 if __name__ == "__main__":
