@@ -6,6 +6,8 @@ import time
 from datetime import datetime
 from google import GoogleSheet
 from thingspeak import Thingspeak
+from scheduler import Scheduler
+import settings
 
 
 def log(msg):
@@ -40,12 +42,10 @@ class Controller:
     Controller class.
     """
 
-    check_period = 10
-    task_period = 5 * 60
-
     def __init__(self):
         self.database = None
         self.thingspeak = None
+        self.scheduler = Scheduler(settings.CONTROLLER_PERIOD_MINUTES, self._sample)
 
     def run(self):
         wait_for_ntp()
@@ -53,16 +53,10 @@ class Controller:
         self.database = GoogleSheet()
         self.thingspeak = Thingspeak()
 
-        last = 0
-        while True:
-            now = time.time()
-            if now - last > self.task_period:
-                last = now
-                self._execute_task()
-            time.sleep(self.check_period)
+        self.scheduler.run()
 
-    def _execute_task(self):
-        log('Task started')
+    def _sample(self):
+        log('Sampling data')
 
         date = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
         data = {'date': date, 'temperature_C': 25, 'pH': 6.0, 'volume_L': 250, 'nutrients_mL': 0}

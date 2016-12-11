@@ -48,3 +48,5 @@ PUMP_GPIO_STEP = 27
 PUMP_CALIBRATION = {
     'steps_per_litre': 8.4e6
 }
+
+CONTROLLER_PERIOD_MINUTES = 5
