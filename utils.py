@@ -30,5 +30,6 @@ def wait_for_ntp():
             time.sleep(5)
     except KeyboardInterrupt:
         log('NTP status check skipped')
+        return
 
     log('NTP status OK')
