@@ -5,7 +5,7 @@ from datetime import datetime
 from google import GoogleSheet
 from thingspeak import Thingspeak
 from scheduler import Scheduler
-from utils import log_init, log, wait_for_ntp
+from utils import log_init, log, log_exception, wait_for_ntp
 import settings
 
 
@@ -35,14 +35,14 @@ class Controller:
 
         try:
             self.database.append(data)
-        except Exception as e:
-            log('Database append failed: ' + str(e))
+        except Exception:
+            log_exception('Database append failed')
             return  # this is a fatal error
 
         try:
             self.thingspeak.append(data)
-        except Exception as e:
-            log('Thingspeak append failed: ' + str(e))
+        except Exception:
+            log_exception('Thingspeak append failed')
             pass  # not a fatal error
 
 
@@ -51,11 +51,13 @@ def main():
 
     while True:
         try:
+            log('Starting controller')
             ctrl = Controller()
             ctrl.run()
-        except Exception as e:
-            log('Controller exception: ' + str(e))
-            time.sleep(60)
+            raise Exception('Controller stopped running')
+        except Exception:
+            log_exception('Unexpected controller exception')
+        time.sleep(60)
 
 
 if __name__ == '__main__':

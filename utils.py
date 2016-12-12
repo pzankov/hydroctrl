@@ -1,6 +1,7 @@
 import time
 import syslog
 import subprocess
+import traceback
 
 
 def log_init():
@@ -10,6 +11,13 @@ def log_init():
 def log(msg):
     print(msg)
     syslog.syslog(msg)
+
+
+def log_exception(msg):
+    log(msg)
+    fmt = traceback.format_exc()
+    for l in fmt.splitlines():
+        log('  ' + l)
 
 
 def wait_for_ntp():
