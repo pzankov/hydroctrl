@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import json
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
@@ -20,25 +21,29 @@ class GoogleSheet:
 
     def __init__(self):
         script_dir = path.dirname(path.abspath(__file__))
-        key_path = path.join(script_dir, 'google_key.json')
-        sheet_id_path = path.join(script_dir, 'google_sheet_id.txt')
 
+        key_path = path.join(script_dir, 'google_key.json')
+        with open(key_path) as f:
+            self.json_key = json.load(f)
+
+        sheet_id_path = path.join(script_dir, 'google_sheet_id.txt')
         with open(sheet_id_path) as f:
             self.sheet_id = f.read().strip()
 
-        scope = ['https://spreadsheets.google.com/feeds']
-        self.credentials = ServiceAccountCredentials.from_json_keyfile_name(key_path, scope)
-
         self.values = self._get_all_values()
 
+    def _open_sheet(self):
+        scope = ['https://spreadsheets.google.com/feeds']
+        credentials = ServiceAccountCredentials.from_json_keyfile_dict(self.json_key, scope)
+        client = gspread.authorize(credentials)
+        return client.open_by_key(self.sheet_id).sheet1
+
     def _get_all_values(self):
-        client = gspread.authorize(self.credentials)
-        sheet = client.open_by_key(self.sheet_id).sheet1
+        sheet = self._open_sheet()
         return sheet.get_all_values()
 
     def _append_row(self, values):
-        client = gspread.authorize(self.credentials)
-        sheet = client.open_by_key(self.sheet_id).sheet1
+        sheet = self._open_sheet()
         sheet.append_row(values)
         self.values.append(values)
 
