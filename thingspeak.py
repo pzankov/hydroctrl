@@ -46,9 +46,9 @@ class Thingspeak:
             if response_data == b'0':
                 raise Exception('Update failed')
         except urllib.error.HTTPError as e:
-            print('Server could not fulfill the request: ' + e.code)
+            raise Exception('Server could not fulfill the request: ' + str(e.code))
         except urllib.error.URLError as e:
-            print('Failed to reach server: ' + e.reason)
+            raise Exception('Failed to reach server: ' + str(e.reason))
 
 
 def main():
