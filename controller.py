@@ -14,6 +14,8 @@ class Controller:
     Controller class.
     """
 
+    try_attempts = 3
+
     def __init__(self):
         self.database = None
         self.thingspeak = None
@@ -27,23 +29,47 @@ class Controller:
 
         self.scheduler.run()
 
-    def _sample(self):
-        log('Sampling data')
+    def _try(self, task, exception_msg):
+        attempts_left = self.try_attempts
+        while True:
+            try:
+                task()
+                return True
+            except Exception:
+                attempts_left -= 1
+                log_exception('%s, %d attempts left' % (exception_msg, attempts_left))
+                if attempts_left == 0:
+                    return False
+            time.sleep(1)
 
+    def _get_data(self):
         date = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
         data = {'date': date, 'temperature_C': 25, 'pH': 6.0, 'volume_L': 250, 'nutrients_mL': 0}
+        return data
 
-        try:
-            self.database.append(data)
-        except Exception:
-            log_exception('Database append failed')
-            return  # this is a fatal error
+    def _save_data(self, data):
+        # Database is a primary storage
+        if not self._try(lambda: self.database.append(data), 'Database append failed'):
+            return False
 
-        try:
-            self.thingspeak.append(data)
-        except Exception:
-            log_exception('Thingspeak append failed')
-            pass  # not a fatal error
+        # It is hard to make an atomic transaction for multiple data storage providers.
+        # Simply ignore all other errors.
+
+        self._try(lambda: self.thingspeak.append(data), 'Thingspeak append failed')
+
+        return True
+
+    def _sample(self):
+        log('Making a new sample')
+
+        data = self._get_data()
+        if data is None:
+            log('Failed to get data')
+            return
+
+        if not self._save_data(data):
+            log('Failed to save data')
+            return
 
 
 def main():
