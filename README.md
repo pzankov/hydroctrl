@@ -66,7 +66,7 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
   - dd [Raspbian image](https://www.raspberrypi.org/downloads/raspbian/) to SD flash
   - Create file with name `ssh` on boot partition
   - Connect Pi to the ethernet cable and power it on
-  - Discover raspberry with `arp -a`
+  - Discover raspberry with `arp-scan -l`
   - Connect via ssh with user `pi` and password `raspberry`
   - `aptitude install vim`
   - `vi /etc/wpa_supplicant/wpa_supplicant.conf`, then add
@@ -96,6 +96,14 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
   - follow [these instructions](https://hallard.me/raspberry-pi-read-only/)
   - `aptitude purge fake-hwclock`
   - add `chmod 1777 /tmp` to `/etc/rc.local`
+  - add these to `/etc/rc.local` (fix ntp trying to create temp file in `/var/lib/ntp/`)
+
+    ```
+    mkdir -p /tmp/ntpfs/upper /tmp/ntpfs/work
+    mount -t overlay overlay -olowerdir=/var/lib/ntp/,upperdir=/tmp/ntpfs/upper,workdir=/tmp/ntpfs/work /var/lib/ntp
+    chown ntp:ntp /var/lib/ntp
+    ```
+
   - add `set viminfo="/tmp/viminfo"` to `.vimrc`
 - Runtime
   - `aptitude install python3 python3-smbus python3-spidev python3-rpi.gpio python3-scipy python3-pip`
