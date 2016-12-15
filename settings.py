@@ -18,7 +18,7 @@ DATA_SPEC = (
 PH_ADC_I2C_BUSN = 1
 PH_ADC_I2C_ADDR = 0x4F
 
-PH_ADC_REF_V = 3.0
+PH_ADC_REF_V = 2.5
 
 PH_CALIBRATION = {
     'temperature': 23,
