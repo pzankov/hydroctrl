@@ -15,9 +15,9 @@ RPi      Sensor
 13 BCM27 Pump STEP
 14 GND   Pump GND
 
-2  5V    Dist 5V
 16 BCM23 Dist TRIG
 18 BCM24 Dist ECHO
 1  3V3   Dist 3V3
-30 GND   Dist GND
+6  GND   Dist GND
+2  5V    Dist 5V
 
