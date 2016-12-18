@@ -6,6 +6,7 @@ from google import GoogleSheet
 from thingspeak import Thingspeak
 from scheduler import Scheduler
 from utils import log_init, log, log_exception, wait_for_ntp
+from temperature import TemperatureInterface
 import settings
 
 
@@ -20,6 +21,7 @@ class Controller:
         self.database = None
         self.thingspeak = None
         self.scheduler = Scheduler(settings.CONTROLLER_PERIOD_MINUTES, self._sample)
+        self.temperature = TemperatureInterface()
 
     def run(self):
         wait_for_ntp()
@@ -43,8 +45,20 @@ class Controller:
             time.sleep(1)
 
     def _get_data(self):
-        date = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
-        data = {'date': date, 'temperature_C': 25, 'pH': 6.0, 'volume_L': 250, 'nutrients_mL': 0}
+        date = datetime.utcnow()
+
+        temperature = self.temperature.get_temperature()
+        pH = 6
+        volume = 250
+
+        data = {
+            'date': date.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            'temperature_C': '%.1f' % temperature,
+            'pH': '%.1f' % pH,
+            'volume_L': '%.0f' % volume,
+            'nutrients_mL': 0
+        }
+
         return data
 
     def _save_data(self, data):
