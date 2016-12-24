@@ -60,6 +60,7 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
 - Make sure peristaltic pump properly compresses the pipe in all rotor positions.
 In my case, pipe holder had to be tightened to prevent free liquid flow in some positions.
 - Replace pullup with a pulldown at SLEEP pin of Easy Driver.
+- Solder a 3.3V jumper in Easy Driver.
 - Solder a voltage reference (e.g. REF3025) to MiniPH and remove the SJ1 jumper.
 
 # Software setup
