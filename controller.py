@@ -7,6 +7,7 @@ from thingspeak import Thingspeak
 from scheduler import Scheduler
 from utils import log_init, log, log_exception, wait_for_ntp
 from temperature import TemperatureInterface
+from ph import PHInterface
 import settings
 
 
@@ -22,6 +23,7 @@ class Controller:
         self.thingspeak = None
         self.scheduler = Scheduler(settings.CONTROLLER_PERIOD_MINUTES, self._sample)
         self.temperature = TemperatureInterface()
+        self.ph = PHInterface()
 
     def run(self):
         wait_for_ntp()
@@ -48,13 +50,13 @@ class Controller:
         date = datetime.utcnow()
 
         temperature = self.temperature.get_temperature()
-        pH = 6
+        pH = self.ph.get_ph(temperature)
         volume = 250
 
         data = {
             'date': date.strftime('%Y-%m-%dT%H:%M:%SZ'),
             'temperature_C': '%.1f' % temperature,
-            'pH': '%.1f' % pH,
+            'pH': '%.2f' % pH,
             'volume_L': '%.0f' % volume,
             'nutrients_mL': 0
         }
