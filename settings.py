@@ -21,10 +21,10 @@ PH_ADC_I2C_ADDR = 0x4F
 PH_ADC_REF_V = 2.5
 
 PH_CALIBRATION = {
-    'temperature': 23,
+    'temperature': 25,
     'points': (
-        {'ph': 4.0, 'voltage': 1.6745},
-        {'ph': 7.0, 'voltage': 1.5}
+        {'ph': 4.0, 'voltage': 1.427},
+        {'ph': 7.0, 'voltage': 1.250}
     )
 }
 
