@@ -2,6 +2,7 @@
 
 import settings
 import smbus
+from statistics import mean
 
 
 class PHTheory:
@@ -86,15 +87,24 @@ class ADCInterface:
 
     adc_bits = 12
 
+    # Noise filtering
+    filter_samples = 256
+
     def value_to_voltage(self, value):
         return float(value) * settings.PH_ADC_REF_V / (1 << self.adc_bits)
 
     def __init__(self):
         self.i2c = smbus.SMBus(settings.PH_ADC_I2C_BUSN)
 
-    def get_value(self):
+    def _get_value(self):
         reading = self.i2c.read_i2c_block_data(settings.PH_ADC_I2C_ADDR, 0x00, 2)
         return (reading[0] << 8) + reading[1]
+
+    def get_value(self):
+        values = []
+        for n in range(0, self.filter_samples):
+            values.append(self._get_value())
+        return mean(values)
 
     def get_voltage(self):
         value = self.get_value()
