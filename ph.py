@@ -121,9 +121,13 @@ class PHInterface:
         self.adc = ADCInterface()
         self.calibration = PHCalibration()
 
-    def get_ph(self, temp):
+    def get_voltage_and_ph(self, temp):
         v = self.adc.get_voltage()
-        return self.calibration.compute_ph(temp, v)
+        ph = self.calibration.compute_ph(temp, v)
+        return {'voltage': v, 'ph': ph}
+
+    def get_ph(self, temp):
+        return self.get_voltage_and_ph(temp)['ph']
 
 
 def main():
