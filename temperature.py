@@ -1,48 +1,35 @@
 #!/usr/bin/env python3
 
-import spidev
-import settings
-import time
-from statistics import mean
+import glob
+from os import path
 
 
 class TemperatureInterface:
     """
-    MAX6675 interface.
+    DS18B20 interface.
     """
 
-    # Limit SPI frequency
-    spi_frequency = 100e3
-
-    # Chip property
-    conversion_time = 0.25
-
-    # Noise filtering
-    filter_samples = 16
-
     def __init__(self):
-        self.spi = spidev.SpiDev()
-        self.spi.open(settings.TEMPERATURE_SPI_BUSN, settings.TEMPERATURE_SPI_DEVN)
-        self.spi.max_speed_hz = int(self.spi_frequency)
+        devices = glob.glob('/sys/bus/w1/devices/28-*')
+        if len(devices) == 0:
+            raise Exception('No devices found')
+        if len(devices) > 1:
+            raise Exception('Found too many devices')
 
-    def _get_temperature(self):
-        data = self.spi.readbytes(2)
-        word = (data[0] << 8) + data[1]
-
-        thermocouple_status = word & (1 << 2)
-        if thermocouple_status != 0:
-            raise Exception('Thermocouple is not connected')
-
-        temperature = (word >> 3) / 4.0
-        return temperature
+        self.file_path = path.join(devices[0], 'w1_slave')
+        if not path.isfile(self.file_path):
+            raise Exception('File %s does not exist' % self.file_path)
 
     def get_temperature(self):
-        values = []
-        for n in range(0, self.filter_samples):
-            values.append(self._get_temperature())
-            if n != self.filter_samples - 1:
-                time.sleep(self.conversion_time)
-        return mean(values)
+        lines = [line.strip() for line in open(self.file_path)]
+        if len(lines) != 2:
+            raise Exception('Invalid lines count')
+
+        if not lines[0].endswith(' YES'):
+            raise Exception('CRC check failed')
+
+        value = lines[1][-5:]
+        return int(value) / 1e3
 
 
 def main():

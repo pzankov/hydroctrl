@@ -36,8 +36,7 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
   (note: voltage reference IC has to be soldered manually)
 - I2C opto isolation by [Sparky's Widgets](https://www.sparkyswidgets.com/product/i2c-isolation-breakout/)
 - pH electrode with BNC plug
-- MAX6675 SPI thermocouple interface
-- K type thermocouple
+- DS18B20 temperature sensor
 - JSN-SR04T waterproof ultrasonic distance sensor (fresh water consumption meter)
 - Logic level converter 3.3V-5V (to connect ultrasonic distance sensor)
 - Peristaltic pump with stepper motor (nutrient pump)
@@ -49,7 +48,7 @@ Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
 
 - I2C
   - pH meter
-- SPI
+- 1-Wire
   - temperature sensor
 - GPIO
   - fresh water consumption meter
@@ -89,6 +88,7 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
     - Advanced Options
       - Enable SPI
       - Enable I2C
+  - add `dtoverlay=w1-gpio` to `/boot/config.txt`
   - `aptitude update && aptitude upgrade`
   - `vi .ssh/authorized_keys` and paste your public ssh key
   - `usermod --lock pi` (disable login with password)
