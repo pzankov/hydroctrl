@@ -76,7 +76,7 @@ class PHCalibration:
             raise Exception('Electrode slope %.2f is out of range, replace the electrode' % self.slope)
 
         # Check offset
-        v_ph7 = self.offset - settings.PH_ADC_OFF_V
+        v_ph7 = self.offset - settings.PH_ADC_V_OFFSET
         if abs(v_ph7) > self.max_v_ph7_drift:
             raise Exception('Electrode offset %.0f mV is out of range, replace the electrode' % (v_ph7 * 1e3))
 
@@ -97,7 +97,7 @@ class ADCInterface:
     filter_samples = 256
 
     def value_to_voltage(self, value):
-        return float(value) * settings.PH_ADC_REF_V / (1 << self.adc_bits)
+        return float(value) * settings.PH_ADC_V_REF / (1 << self.adc_bits)
 
     def __init__(self):
         self.i2c = smbus.SMBus(settings.PH_ADC_I2C_BUSN)
