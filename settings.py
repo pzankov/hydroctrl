@@ -19,6 +19,7 @@ PH_ADC_I2C_BUSN = 1
 PH_ADC_I2C_ADDR = 0x4F
 
 PH_ADC_REF_V = 2.5
+PH_ADC_OFF_V = 1.251
 
 PH_CALIBRATION = {
     'temperature': 21.2,

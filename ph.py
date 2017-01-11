@@ -11,6 +11,7 @@ class PHTheory:
 
     Functions are derived from the following equation:
     V = Voffset - slope * R * T * LN10 / F * (pH - 7)
+    Voffset = V_pH7 + V_ADC_Offset
     """
 
     @staticmethod
@@ -49,6 +50,10 @@ class PHCalibration:
     Parse calibration data.
     """
 
+    # Acceptable electrode properties (compared to ideal electrode)
+    max_slope_drift = 0.2
+    max_v_ph7_drift = 30e-3
+
     def __init__(self):
         if len(settings.PH_CALIBRATION['points']) != 2:
             raise Exception('Only two point calibration is supported')
@@ -62,19 +67,20 @@ class PHCalibration:
             point1['ph'], point1['voltage'],
             point2['ph'], point2['voltage'])
 
-        # Slope drifts away as electrode degrades
-        if abs(self.slope - 1) > 0.2:
-            raise Exception('pH slope %.2f is out of range, consider replacing the electrode' % self.slope)
-
         self.offset = PHTheory.compute_offset(
             temp, self.slope,
             point1['ph'], point1['voltage'])
 
-        # Assume Voffset = Vref / 2
-        if abs(self.offset - settings.PH_ADC_REF_V / 2) > settings.PH_ADC_REF_V * 0.1:
-            raise Exception('pH offset %.3f is out of range' % self.offset)
+        # Check slope
+        if abs(self.slope - 1) > self.max_slope_drift:
+            raise Exception('Electrode slope %.2f is out of range, replace the electrode' % self.slope)
 
-        print('pH slope %.2f, offset %.3f' % (self.slope, self.offset))
+        # Check offset
+        v_ph7 = self.offset - settings.PH_ADC_OFF_V
+        if abs(v_ph7) > self.max_v_ph7_drift:
+            raise Exception('Electrode offset %.0f mV is out of range, replace the electrode' % (v_ph7 * 1e3))
+
+        print('pH electrode status: slope %.2f, offset %.0f mV' % (self.slope, v_ph7 * 1e3))
 
     def compute_ph(self, temp, v):
         return PHTheory.compute_ph(temp, self.offset, self.slope, v)
