@@ -28,7 +28,7 @@ class TemperatureInterface:
         if not lines[0].endswith(' YES'):
             raise Exception('CRC check failed')
 
-        value = lines[1][-5:]
+        value = lines[1][lines[1].rindex('=') + 1:]
         return int(value) / 1e3
 
 
