@@ -8,6 +8,7 @@ from scheduler import Scheduler
 from utils import log_init, log, log_exception, wait_for_ntp
 from temperature import TemperatureInterface
 from ph import PHInterface
+from pump import PumpInterface
 import settings
 
 
@@ -21,9 +22,10 @@ class Controller:
     def __init__(self):
         self.database = None
         self.thingspeak = None
-        self.scheduler = Scheduler(settings.CONTROLLER_PERIOD_MINUTES, self._sample)
+        self.scheduler = Scheduler(settings.CONTROLLER_PERIOD_MINUTES, self._do_iteration)
         self.temperature = TemperatureInterface()
         self.ph = PHInterface()
+        self.pump = PumpInterface()
 
     def run(self):
         wait_for_ntp()
@@ -46,23 +48,6 @@ class Controller:
                     return False
             time.sleep(1)
 
-    def _get_data(self):
-        date = datetime.utcnow()
-
-        temperature = self.temperature.get_temperature()
-        pH = self.ph.get_ph(temperature)
-        volume = 250
-
-        data = {
-            'date': date.strftime('%Y-%m-%dT%H:%M:%SZ'),
-            'temperature_C': '%.1f' % temperature,
-            'pH': '%.2f' % pH,
-            'volume_L': '%.0f' % volume,
-            'nutrients_mL': 0
-        }
-
-        return data
-
     def _save_data(self, data):
         # Database is a primary storage
         if not self._try(lambda: self.database.append(data), 'Database append failed'):
@@ -75,17 +60,45 @@ class Controller:
 
         return True
 
-    def _sample(self):
-        log('Making a new sample')
+    def _estimate_nutrients(self, pH):
+        if pH < settings.DESIRED_PH:
+            return 0
 
-        data = self._get_data()
-        if data is None:
-            log('Failed to get data')
-            return
+        nutrients_over_pH = settings.NUTRIENTS_CONCENTRATION_OVER_PH * settings.SOLUTION_VOLUME
+        pH_error = pH - settings.DESIRED_PH
+
+        nutrients = nutrients_over_pH * pH_error * settings.PROPORTIONAL_K
+
+        if nutrients < settings.MIN_PUMPED_NUTRIENTS:
+            return 0
+
+        return nutrients
+
+    def _do_iteration(self):
+        log('Starting a new iteration')
+
+        date = datetime.utcnow()
+
+        temperature = self.temperature.get_temperature()
+        pH = self.ph.get_ph(temperature)
+        volume = 250
+
+        nutrients = self._estimate_nutrients(pH)
+
+        data = {
+            'date': date.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            'temperature_C': '%.1f' % temperature,
+            'pH': '%.2f' % pH,
+            'volume_L': '%.0f' % volume,
+            'nutrients_mL': '%.1f' % (nutrients * 1e3)
+        }
 
         if not self._save_data(data):
             log('Failed to save data')
             return
+
+        # We only add nutrients after their amount was logged
+        self.pump.pump(nutrients)
 
 
 def main():
