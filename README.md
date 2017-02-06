@@ -24,10 +24,12 @@ Data from Thingspeak can be easily viewed with a mobile app.
 
 # Regulation
 
-When consumed solution is replaced with a fresh water it is usually enough to adjust pH by addition of new nutrients.
-EC value usually stays within an acceptable range.
+In a setup where consumed solution is replaced with a fresh water it is enough to adjust pH by addition of new nutrients.
+EC value usually stays within an acceptable range and requires no control.
 
-Thus, we can get rid of EC sensor and pH+/pH- regulatory channels.
+This controller implements a discrete proportional regulation algorithm.
+At each iteration, a pH state of the solution is measured.
+Then, nutrients are added in amount proportional to the difference between actual and desired pH.
 
 # Hardware
 
