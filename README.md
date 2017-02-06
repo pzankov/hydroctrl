@@ -66,7 +66,7 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
 
 # Software setup
 
-- Installation and basic setup
+- OS installation and basic setup
   - dd [Raspbian image](https://www.raspberrypi.org/downloads/raspbian/) to SD flash
   - Create file with name `ssh` on boot partition
   - Connect Pi to the ethernet cable and power it on
@@ -119,7 +119,7 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
   - create a google spreadsheet and remove all rows but the first one.
   Save spreadsheet ID to `google_sheet_id.txt`.
   - obtain google credentials for [gspread](https://github.com/burnash/gspread) as described [here](http://gspread.readthedocs.io/en/latest/oauth2.html).
-  Don't forget to share the spreadsheet with an email in `json_key['client_email']`.
+  Don't forget to share the spreadsheet with the email specified in `json_key['client_email']`.
   Save credentials to `google_key.json`.
   - finally, add `su -c /path/to/controller.py pi &` to `/etc/rc.local`
 
@@ -132,10 +132,11 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
   - `vim-addons install python-jedi`
   - `aptitude install fish`
   - take vim/git/fish config from [this repo](https://github.com/pzankov/cfg)
-  - `vi /etc/locale.gen` and uncomment `en_US.UTF-8`, then `locale-gen`
+  - `vi /etc/locale.gen`, then uncomment `en_US.UTF-8`, then run `locale-gen`
   - `aptitude install ipython3`
   - `aptitude install time`
   - `aptitude install wcalc`
+  - create scripts `/usr/bin/rw` and `/usr/bin/ro` with commands `sudo mount -o remount,rw /` and `sudo mount -o remount,ro /`
 
 ## Notes
 
