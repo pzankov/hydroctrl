@@ -2,7 +2,7 @@
 
 import settings
 import smbus
-from statistics import mean
+from statistics import mean, pstdev
 
 
 class PHTheory:
@@ -106,15 +106,29 @@ class ADCInterface:
         reading = self.i2c.read_i2c_block_data(settings.PH_ADC_I2C_ADDR, 0x00, 2)
         return (reading[0] << 8) + reading[1]
 
-    def get_value(self):
+    def _get_values(self):
         values = []
         for n in range(0, self.filter_samples):
             values.append(self._get_value())
+        return values
+
+    def get_value(self):
+        values = self._get_values()
         return mean(values)
 
     def get_voltage(self):
         value = self.get_value()
         return self.value_to_voltage(value)
+
+    def get_value_with_stat(self):
+        values = self._get_values()
+        return {'value': mean(values), 'value_dev': pstdev(values)}
+
+    def get_voltage_with_stat(self):
+        data = self.get_value_with_stat()
+        data['voltage'] = self.value_to_voltage(data['value'])
+        data['voltage_dev'] = self.value_to_voltage(data['value_dev'])
+        return data
 
 
 class PHInterface:
@@ -127,13 +141,15 @@ class PHInterface:
         self.adc = ADCInterface()
         self.calibration = PHCalibration()
 
-    def get_voltage_and_ph(self, temp):
-        v = self.adc.get_voltage()
-        ph = self.calibration.compute_ph(temp, v)
-        return {'voltage': v, 'ph': ph}
-
     def get_ph(self, temp):
-        return self.get_voltage_and_ph(temp)['ph']
+        voltage = self.adc.get_voltage()
+        return self.calibration.compute_ph(temp, voltage)
+
+    def get_ph_with_stat(self, temp):
+        data = self.adc.get_voltage_with_stat()
+        data['ph'] = self.calibration.compute_ph(temp, data['voltage'])
+        data['ph_dev'] = data['voltage_dev'] / PHTheory.ideal_slope(temp)
+        return data
 
 
 def main():
