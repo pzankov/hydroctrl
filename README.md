@@ -42,7 +42,7 @@ Then, nutrients are added in amount proportional to the difference between actua
 - JSN-SR04T waterproof ultrasonic distance sensor (fresh water consumption meter)
 - Logic level converter 3.3V-5V (to connect ultrasonic distance sensor)
 - Peristaltic pump with stepper motor (nutrient pump)
-- Easy Driver stepper motor driver by [Brian Schmalz](http://www.schmalzhaus.com/EasyDriver/)
+- Big Easy Driver stepper motor driver by [Brian Schmalz](http://www.schmalzhaus.com/BigEasyDriver/)
 - DC-DC step down converter 12V to 5V 5A
 - 12V power supply
 
@@ -62,6 +62,7 @@ Then, nutrients are added in amount proportional to the difference between actua
 In my case, pipe holder had to be tightened to prevent free liquid flow in some positions.
 - Replace pullup with a pulldown at SLEEP pin of Easy Driver.
 - Solder a 3.3V jumper in Easy Driver.
+- Adjust Easy Driver current to match stepper motor rating.
 - Solder a voltage reference (e.g. REF3025) to MiniPH and remove the SJ1 jumper.
 
 # Software setup
