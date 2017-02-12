@@ -2,14 +2,12 @@ RPi      Sensor
 
 5 SCL    pH   SCL
 3 SDA    pH   SDA
-1 3v3    pH   3V3
+1 3V3    pH   3V3
 6 GND    pH   GND
 
-21 MISO  Temp MISO
-24 CE0   Temp CS
-23 SCLK  Temp SCK
-17 3v3   Temp 3V3
-20 GND   Temp GND
+1 3V3    Temp VCC
+9 GND    Temp GND
+7 Data   Temp DQ
 
 11 BCM17 Pump SLEEP
 13 BCM27 Pump STEP
