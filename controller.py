@@ -49,10 +49,10 @@ class Controller:
         if pH < settings.DESIRED_PH:
             return 0
 
-        nutrients_over_pH = settings.NUTRIENTS_CONCENTRATION_OVER_PH * settings.SOLUTION_VOLUME
+        nutrients_per_pH = settings.NUTRIENTS_CONCENTRATION_PER_PH * settings.SOLUTION_VOLUME
         pH_error = pH - settings.DESIRED_PH
 
-        nutrients = nutrients_over_pH * pH_error * settings.PROPORTIONAL_K
+        nutrients = nutrients_per_pH * pH_error * settings.PROPORTIONAL_K
 
         if nutrients < settings.MIN_PUMPED_NUTRIENTS:
             return 0
