@@ -11,7 +11,7 @@ DATA_SPEC = (
     'date',
     'temperature_C',
     'pH',
-    'volume_L',
+    'water_tank_L',
     'nutrients_mL'
 )
 

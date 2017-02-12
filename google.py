@@ -57,7 +57,7 @@ class GoogleSheet:
 def main():
     s = GoogleSheet()
     date = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
-    s.append({'date': date, 'temperature_C': 25, 'pH': 6.0, 'volume_L': 250, 'nutrients_mL': 0})
+    s.append({'date': date, 'temperature_C': 25, 'pH': 6.0, 'water_tank_L': 250, 'nutrients_mL': 0})
 
 
 if __name__ == '__main__':

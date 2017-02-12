@@ -67,7 +67,7 @@ class Controller:
 
         temperature = self.temperature.get_temperature()
         pH = self.ph.get_ph(temperature)
-        volume = 250
+        tank_volume = 250
 
         nutrients = self._estimate_nutrients(pH)
 
@@ -75,7 +75,7 @@ class Controller:
             'date': date.strftime('%Y-%m-%dT%H:%M:%SZ'),
             'temperature_C': '%.1f' % temperature,
             'pH': '%.2f' % pH,
-            'volume_L': '%.0f' % volume,
+            'water_tank_L': '%.0f' % tank_volume,
             'nutrients_mL': '%.1f' % (nutrients * 1e3)
         }
 
