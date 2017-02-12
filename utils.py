@@ -41,3 +41,16 @@ def wait_for_ntp():
         return
 
     log('NTP status OK')
+
+
+def retry(job, error_msg, attempts=3, delay=1):
+    while True:
+        try:
+            job()
+            return True
+        except Exception:
+            attempts -= 1
+            log_exception('%s, %d attempts left' % (error_msg, attempts))
+            if attempts == 0:
+                return False
+        time.sleep(delay)

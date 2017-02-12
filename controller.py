@@ -5,7 +5,7 @@ from datetime import datetime
 from google import GoogleSheet
 from thingspeak import Thingspeak
 from scheduler import Scheduler
-from utils import log_init, log, log_exception, wait_for_ntp
+from utils import log_init, log, log_exception, wait_for_ntp, retry
 from temperature import TemperatureInterface
 from ph import PHInterface
 from pump import PumpInterface
@@ -16,8 +16,6 @@ class Controller:
     """
     Controller class.
     """
-
-    try_attempts = 3
 
     def __init__(self):
         self.database = None
@@ -35,28 +33,15 @@ class Controller:
 
         self.scheduler.run()
 
-    def _try(self, task, exception_msg):
-        attempts_left = self.try_attempts
-        while True:
-            try:
-                task()
-                return True
-            except Exception:
-                attempts_left -= 1
-                log_exception('%s, %d attempts left' % (exception_msg, attempts_left))
-                if attempts_left == 0:
-                    return False
-            time.sleep(1)
-
     def _save_data(self, data):
         # Database is a primary storage
-        if not self._try(lambda: self.database.append(data), 'Database append failed'):
+        if not retry(lambda: self.database.append(data), 'Database append failed'):
             return False
 
         # It is hard to make an atomic transaction for multiple data storage providers.
         # Simply ignore all other errors.
 
-        self._try(lambda: self.thingspeak.append(data), 'Thingspeak append failed')
+        retry(lambda: self.thingspeak.append(data), 'Thingspeak append failed')
 
         return True
 
