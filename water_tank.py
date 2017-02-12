@@ -7,7 +7,7 @@ from scipy import interpolate
 import settings
 
 
-class DistanceInterface:
+class DistanceMeterInterface:
     """
     Ultrasonic distance meter JSN-SR04T.
     """
@@ -29,30 +29,30 @@ class DistanceInterface:
     def __init__(self):
         GPIO.setmode(GPIO.BCM)
 
-        GPIO.setup(settings.DISTANCE_GPIO_TRIG, GPIO.OUT)
-        GPIO.setup(settings.DISTANCE_GPIO_ECHO, GPIO.IN)
+        GPIO.setup(settings.DISTANCE_METER_GPIO_TRIG, GPIO.OUT)
+        GPIO.setup(settings.DISTANCE_METER_GPIO_ECHO, GPIO.IN)
 
-        GPIO.output(settings.DISTANCE_GPIO_TRIG, False)
+        GPIO.output(settings.DISTANCE_METER_GPIO_TRIG, False)
         time.sleep(self.warmup_time)
 
     def __del__(self):
         GPIO.cleanup()
 
     def get_distance(self):
-        GPIO.output(settings.DISTANCE_GPIO_TRIG, True)
+        GPIO.output(settings.DISTANCE_METER_GPIO_TRIG, True)
         time.sleep(self.trig_hold_time)
-        GPIO.output(settings.DISTANCE_GPIO_TRIG, False)
+        GPIO.output(settings.DISTANCE_METER_GPIO_TRIG, False)
 
         start = None
         end = None
 
         for t in range(0, self.poll_cycle_limit):
-            if GPIO.input(settings.DISTANCE_GPIO_ECHO) == 1:
+            if GPIO.input(settings.DISTANCE_METER_GPIO_ECHO) == 1:
                 start = time.time()
                 break
 
         for t in range(0, self.poll_cycle_limit):
-            if GPIO.input(settings.DISTANCE_GPIO_ECHO) == 0:
+            if GPIO.input(settings.DISTANCE_METER_GPIO_ECHO) == 0:
                 end = time.time()
                 break
 
@@ -96,7 +96,7 @@ class WaterTankInterface:
     """
 
     def __init__(self):
-        self.distanceInterface = DistanceInterface()
+        self.distanceInterface = DistanceMeterInterface()
         self.calibration = WaterTankCalibration()
 
     def get_volume(self):
