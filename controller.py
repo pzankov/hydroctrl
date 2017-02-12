@@ -26,6 +26,7 @@ class Controller:
         self.pump = PumpInterface()
 
     def run(self):
+        # Synchronize clock (we don't have a RTC module)
         wait_for_ntp()
 
         self.database = GoogleSheet()
