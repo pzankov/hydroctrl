@@ -34,18 +34,6 @@ class Controller:
 
         self.scheduler.run()
 
-    def _save_data(self, data):
-        # Database is a primary storage
-        if not retry(lambda: self.database.append(data), 'Database append failed'):
-            return False
-
-        # It is hard to make an atomic transaction for multiple data storage providers.
-        # Simply ignore all other errors.
-
-        retry(lambda: self.thingspeak.append(data), 'Thingspeak append failed')
-
-        return True
-
     def _estimate_nutrients(self, pH):
         if pH < settings.DESIRED_PH:
             return 0
@@ -79,11 +67,12 @@ class Controller:
             'nutrients_mL': '%.1f' % (nutrients * 1e3)
         }
 
-        if not self._save_data(data):
-            log_err('Failed to save data')
-            return
+        retry(lambda: self.database.append(data), 'Database append failed')
 
-        # We only add nutrients after their amount was logged
+        # Data is already in DB, ignore Thingspeak errors
+        retry(lambda: self.thingspeak.append(data), 'Thingspeak append failed', rethrow=False)
+
+        # We only add nutrients after their amount was logged to DB
         self.pump.pump(nutrients)
 
 
