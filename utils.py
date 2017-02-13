@@ -8,16 +8,23 @@ def log_init():
     syslog.openlog('hydroctrl')
 
 
-def log(msg):
+def _log(msg):
     print(msg)
     syslog.syslog(msg)
 
 
-def log_exception(msg):
-    log(msg)
+def log_info(msg):
+    _log('INFO: ' + msg)
+
+
+def log_err(msg):
+    _log('ERROR: ' + msg)
+
+
+def log_exception_trace():
     fmt = traceback.format_exc()
     for l in fmt.splitlines():
-        log('  ' + l)
+        _log('  ' + l)
 
 
 def wait_for_ntp():
@@ -25,7 +32,7 @@ def wait_for_ntp():
     Wait until NTP selects a peer.
     """
 
-    log('Waiting for NTP, press Ctrl+C to skip')
+    log_info('Waiting for NTP, press Ctrl+C to skip')
 
     try:
         while True:
@@ -34,13 +41,13 @@ def wait_for_ntp():
             sync_peers = sum(l[0] == ord('*') for l in lines)  # sync peer is labelled with a star
             if sync_peers > 0:
                 break
-            log('Waiting for NTP')
+            log_info('Waiting for NTP')
             time.sleep(5)
     except KeyboardInterrupt:
-        log('NTP status check skipped')
+        log_info('NTP status check skipped')
         return
 
-    log('NTP status OK')
+    log_info('NTP status OK')
 
 
 def retry(job, error_msg, attempts=3, delay=1):
@@ -50,7 +57,8 @@ def retry(job, error_msg, attempts=3, delay=1):
             return True
         except Exception:
             attempts -= 1
-            log_exception('%s, %d attempts left' % (error_msg, attempts))
+            log_info('%s, %d attempts left' % (error_msg, attempts))
+            log_exception_trace()
             if attempts == 0:
                 return False
         time.sleep(delay)

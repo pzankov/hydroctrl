@@ -5,7 +5,7 @@ from datetime import datetime
 from google import GoogleSheet
 from thingspeak import Thingspeak
 from scheduler import Scheduler
-from utils import log_init, log, log_exception, wait_for_ntp, retry
+from utils import log_init, log_info, log_err, log_exception_trace, wait_for_ntp, retry
 from temperature import TemperatureInterface
 from ph import PHInterface
 from pump import PumpInterface
@@ -61,7 +61,7 @@ class Controller:
         return nutrients
 
     def _do_iteration(self):
-        log('Starting a new iteration')
+        log_info('Starting a new iteration')
 
         date = datetime.utcnow()
 
@@ -80,7 +80,7 @@ class Controller:
         }
 
         if not self._save_data(data):
-            log('Failed to save data')
+            log_err('Failed to save data')
             return
 
         # We only add nutrients after their amount was logged
@@ -92,12 +92,13 @@ def main():
 
     while True:
         try:
-            log('Starting controller')
+            log_info('Starting controller')
             ctrl = Controller()
             ctrl.run()
             raise Exception('Controller stopped running')
         except Exception:
-            log_exception('Unexpected controller exception')
+            log_err('Unexpected controller exception')
+            log_exception_trace()
         time.sleep(60)
 
 
