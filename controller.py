@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import gc
 import time
 from datetime import datetime
 from google import GoogleSheet
@@ -80,14 +81,21 @@ def main():
     log_init()
 
     while True:
+        log_info('Starting controller')
+
+        ctrl = None
+
         try:
-            log_info('Starting controller')
             ctrl = Controller()
             ctrl.run()
             raise Exception('Controller stopped running')
         except Exception:
             log_err('Unexpected controller exception')
             log_exception_trace()
+
+        del ctrl
+        gc.collect()
+
         time.sleep(60)
 
 
