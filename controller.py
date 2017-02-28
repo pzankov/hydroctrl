@@ -11,6 +11,14 @@ from pump import PumpInterface
 import settings
 
 
+class FatalException(Exception):
+    """
+    Throw this to exit the control loop,
+    e.g. if a sensor failure was detected.
+    """
+    pass
+
+
 class Controller:
     """
     Controller class.
@@ -32,6 +40,7 @@ class Controller:
         self.database = GoogleSheet()
         self.thingspeak = Thingspeak()
 
+        # Enter the control loop
         self.scheduler.run()
 
     def _estimate_nutrients(self, pH):
@@ -78,7 +87,11 @@ class Controller:
     def _do_iteration_nothrow(self):
         try:
             self._do_iteration()
+        except FatalException:
+            # Stop iterating
+            raise
         except Exception as e:
+            # Ignore all other possibly transient errors
             log_warn('Iteration failed: ' + str(e))
             log_exception_trace()
 
