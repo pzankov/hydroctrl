@@ -17,6 +17,10 @@ def log_info(msg):
     _log('INFO: ' + msg)
 
 
+def log_warn(msg):
+    _log('WARN: ' + msg)
+
+
 def log_err(msg):
     _log('ERROR: ' + msg)
 

@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
-import gc
-import time
 from datetime import datetime
 from google import GoogleSheet
 from thingspeak import Thingspeak
 from scheduler import Scheduler
-from utils import log_init, log_info, log_err, log_exception_trace, wait_for_ntp, retry
+from utils import log_init, log_info, log_warn, log_err, log_exception_trace, wait_for_ntp, retry
 from temperature import TemperatureInterface
 from ph import PHInterface
 from pump import PumpInterface
@@ -21,7 +19,7 @@ class Controller:
     def __init__(self):
         self.database = None
         self.thingspeak = None
-        self.scheduler = Scheduler(settings.CONTROLLER_PERIOD_MINUTES, self._do_iteration)
+        self.scheduler = Scheduler(settings.CONTROLLER_PERIOD_MINUTES, self._do_iteration_nothrow)
         self.temperature = TemperatureInterface()
         self.ph = PHInterface()
         self.pump = PumpInterface()
@@ -30,6 +28,7 @@ class Controller:
         # Synchronize clock (we don't have a RTC module)
         wait_for_ntp()
 
+        # These objects require internet connection
         self.database = GoogleSheet()
         self.thingspeak = Thingspeak()
 
@@ -76,27 +75,26 @@ class Controller:
         # We only add nutrients after their amount was logged to DB
         self.pump.pump(nutrients)
 
+    def _do_iteration_nothrow(self):
+        try:
+            self._do_iteration()
+        except Exception as e:
+            log_warn('Iteration failed: ' + str(e))
+            log_exception_trace()
+
 
 def main():
     log_init()
+    log_info('Starting controller')
 
-    while True:
-        log_info('Starting controller')
+    try:
+        ctrl = Controller()
+        ctrl.run()
 
-        ctrl = None
-
-        try:
-            ctrl = Controller()
-            ctrl.run()
-            raise Exception('Controller stopped running')
-        except Exception:
-            log_err('Unexpected controller exception')
-            log_exception_trace()
-
-        del ctrl
-        gc.collect()
-
-        time.sleep(60)
+        log_err('Controller stopped running')
+    except Exception as e:
+        log_err('Unexpected exception: ' + str(e))
+        log_exception_trace()
 
 
 if __name__ == '__main__':
