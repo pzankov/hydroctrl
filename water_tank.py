@@ -12,18 +12,25 @@ class DistanceMeterInterface:
     Ultrasonic distance meter JSN-SR04T.
     """
 
-    sound_speed = 343.21  # at 20 C
+    # Noise filtering
+    filter_samples = 32
 
-    # Must be enough to finish send-receive sequence
-    warmup_time = 0.1
+    # How much distances can differ, usually they fit into 1cm range
+    filter_precision = 0.03
+
+    # At 20 C
+    sound_speed = 343.21
+
+    # Time for signal reflections to fully decay
+    decay_time = 0.1
 
     # Sensor properties
     trig_hold_time = 10e-6
-    dist_min = 0.23
-    dist_max = 4
 
-    # Limit polling loop iterations, this is faster than comparing time.
-    # Looping speed is limited by GPIO speed. Normally less than 5000 iterations are needed.
+    # Limit polling loop iterations.
+    # This is faster (and thus more precise) than comparing timestamps.
+    # NOTE: Looping speed is only limited by CPU/GPIO speed.
+    # Normally less than 5000 iterations are needed.
     poll_cycle_limit = 10 * 1000
 
     def __init__(self):
@@ -33,12 +40,13 @@ class DistanceMeterInterface:
         GPIO.setup(settings.DISTANCE_METER_GPIO_ECHO, GPIO.IN)
 
         GPIO.output(settings.DISTANCE_METER_GPIO_TRIG, False)
-        time.sleep(self.warmup_time)
 
     def __del__(self):
         GPIO.cleanup()
 
-    def get_distance(self):
+    def _get_distance(self):
+        time.sleep(self.decay_time)
+
         GPIO.output(settings.DISTANCE_METER_GPIO_TRIG, True)
         time.sleep(self.trig_hold_time)
         GPIO.output(settings.DISTANCE_METER_GPIO_TRIG, False)
@@ -64,10 +72,26 @@ class DistanceMeterInterface:
 
         dist = (end - start) * self.sound_speed / 2
 
-        if dist < self.dist_min or dist > self.dist_max:
-            raise Exception('Distance is out of range')
-
         return dist
+
+    def get_distance(self):
+        values = []
+
+        # NOTE: Exceptions are intentionally propagated to fail the whole sequence
+        for n in range(0, self.filter_samples):
+            values.append(self._get_distance())
+
+        low = min(values)
+        high = max(values)
+
+        # Spreading can be caused by side reflections or other interference
+        if high - low > self.filter_precision:
+            raise Exception('Distance values are too spread (from %.2fm to %.2fm)' % (low, high))
+
+        # Ultrasonic distance meter emits a train of pulses after being triggered.
+        # Depending on which of those pulses is received, distance will vary a bit.
+        # We aim for the first pulse, thus return the lowest distance from the set.
+        return low
 
 
 class WaterTankCalibration:
@@ -101,11 +125,7 @@ class WaterTankInterface:
 
     def get_volume(self):
         distance = self.distanceInterface.get_distance()
-
         volume = self.calibration.get_volume(distance)
-        if volume < 0:
-            return 0
-
         return volume
 
 
