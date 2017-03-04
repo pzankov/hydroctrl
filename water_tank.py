@@ -123,15 +123,23 @@ class WaterTankInterface:
         self.distanceInterface = DistanceMeterInterface()
         self.calibration = WaterTankCalibration()
 
-    def get_volume(self):
+    def get_volume_and_distance(self):
         distance = self.distanceInterface.get_distance()
         volume = self.calibration.get_volume(distance)
-        return volume
+        return volume, distance
+
+    def get_volume(self):
+        return self.get_volume_and_distance()[0]
 
 
 def main():
     tank = WaterTankInterface()
-    print('%5.1f' % tank.get_volume())
+    while True:
+        try:
+            volume, distance = tank.get_volume_and_distance()
+            print('%5.1fcm %5.1fL' % (distance * 100, volume))
+        except Exception as e:
+            print(e)
 
 
 if __name__ == '__main__':
