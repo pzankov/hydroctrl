@@ -3,6 +3,7 @@
 import settings
 import smbus
 from statistics import mean, pstdev
+from temperature import TemperatureInterface
 
 
 class PHTheory:
@@ -153,8 +154,16 @@ class PHInterface:
 
 
 def main():
+    temperature = TemperatureInterface()
     ph = PHInterface()
-    print('%.2f' % ph.get_ph(25))
+    while True:
+        try:
+            temp = temperature.get_temperature()
+            data = ph.get_ph_with_stat(temp)
+            print('%.1fC  %.3fV +- %2.0fmV  %.2fpH +- %.2fpH' %
+                  (temp, data['voltage'], data['voltage_dev'] * 1e3, data['ph'], data['ph_dev']))
+        except Exception as e:
+            print(e)
 
 
 if __name__ == '__main__':
