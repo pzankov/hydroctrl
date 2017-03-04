@@ -64,7 +64,10 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
     - Replace pullup with a pulldown at SLEEP pin.
     - Solder a 3.3V jumper.
     - Adjust current to match stepper motor rating.
-- Solder a voltage reference (e.g. REF3025) to MiniPH and remove the SJ1 jumper.
+- MinipH
+    - Remove the SJ1 jumper
+    - Solder a voltage reference IC (e.g. REF3025)
+    - Solder a 3.3V jumper on the I2C opto isolation
 - Solder power supply wires directly to RPi board (Micro USB plug is not reliable).
 
 # Software setup
