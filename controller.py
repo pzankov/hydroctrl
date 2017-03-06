@@ -29,7 +29,7 @@ class Controller:
         self.thingspeak = None
         self.scheduler = Scheduler(settings.CONTROLLER_PERIOD_MINUTES, self._do_iteration_nothrow)
         self.temperature = TemperatureInterface()
-        self.ph = PHInterface()
+        self.ph = PHInterface(settings.PH)
         self.pump = PumpInterface()
 
     def run(self):

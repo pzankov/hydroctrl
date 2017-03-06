@@ -54,29 +54,25 @@ class PHCalibration:
     max_slope_drift = 0.2
     max_v_ph7_drift = 30e-3
 
-    def __init__(self):
-        if len(settings.PH_CALIBRATION['points']) != 2:
+    def __init__(self, adc_offset, temp, points):
+        if len(points) != 2:
             raise Exception('Only two point calibration is supported')
-
-        point1 = settings.PH_CALIBRATION['points'][0]
-        point2 = settings.PH_CALIBRATION['points'][1]
-        temp = settings.PH_CALIBRATION['temperature']
 
         self.slope = PHTheory.compute_slope(
             temp,
-            point1['ph'], point1['voltage'],
-            point2['ph'], point2['voltage'])
+            points[0]['ph'], points[0]['voltage'],
+            points[1]['ph'], points[1]['voltage'])
 
         self.offset = PHTheory.compute_offset(
             temp, self.slope,
-            point1['ph'], point1['voltage'])
+            points[0]['ph'], points[0]['voltage'])
 
         # Check slope
         if abs(self.slope - 1) > self.max_slope_drift:
             raise Exception('Electrode slope %.2f is out of range, replace the electrode' % self.slope)
 
         # Check offset
-        v_ph7 = self.offset - settings.PH_ADC_V_OFFSET
+        v_ph7 = self.offset - adc_offset
         if abs(v_ph7) > self.max_v_ph7_drift:
             raise Exception('Electrode offset %.0f mV is out of range, replace the electrode' % (v_ph7 * 1e3))
 
@@ -92,12 +88,18 @@ class PHInterface:
     calibration and temperature compensation.
     """
 
-    def __init__(self):
-        self.adc = MCP3221(i2c_busn=settings.PH_ADC_I2C_BUSN,
-                           i2c_addr=settings.PH_ADC_I2C_ADDR,
-                           vref=settings.PH_ADC_V_REF)
+    def __init__(self, config):
+        self.adc = MCP3221(
+            i2c_busn=config['adc']['i2c_busn'],
+            i2c_addr=config['adc']['i2c_addr'],
+            v_ref=config['adc']['v_ref'])
+
         self.adc = ADCFilter(self.adc)
-        self.calibration = PHCalibration()
+
+        self.calibration = PHCalibration(
+            adc_offset=config['adc']['v_off'],
+            temp=config['calibration']['temperature'],
+            points=config['calibration']['points'])
 
     def get_ph(self, temp):
         voltage = self.adc.get_voltage()
@@ -112,7 +114,7 @@ class PHInterface:
 
 def main():
     temperature = TemperatureInterface()
-    ph = PHInterface()
+    ph = PHInterface(settings.PH)
     while True:
         try:
             temp = temperature.get_temperature()

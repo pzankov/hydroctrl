@@ -15,18 +15,20 @@ DATA_SPEC = (
     'nutrients_mL'
 )
 
-PH_ADC_I2C_BUSN = 1
-PH_ADC_I2C_ADDR = 0x4F
-
-PH_ADC_V_REF = 2.5
-PH_ADC_V_OFFSET = 1.251
-
-PH_CALIBRATION = {
-    'temperature': 21.2,
-    'points': (
-        {'ph': 4.0, 'voltage': 1.418},
-        {'ph': 7.0, 'voltage': 1.224}
-    )
+PH = {
+    'adc': {
+        'i2c_busn': 1,
+        'i2c_addr': 0x4F,
+        'v_ref': 2.5,
+        'v_off': 1.251,
+    },
+    'calibration': {
+        'temperature': 21.2,
+        'points': (
+            {'ph': 4.0, 'voltage': 1.418},
+            {'ph': 7.0, 'voltage': 1.224}
+        )
+    }
 }
 
 DISTANCE_METER_GPIO_TRIG = 23

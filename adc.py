@@ -9,13 +9,13 @@ class MCP3221:
 
     adc_bits = 12
 
-    def __init__(self, i2c_busn, i2c_addr, vref):
+    def __init__(self, i2c_busn, i2c_addr, v_ref):
         self.i2c_addr = i2c_addr
-        self.vref = vref
+        self.v_ref = v_ref
         self.i2c = smbus.SMBus(i2c_busn)
 
     def value_to_voltage(self, value):
-        return float(value) * self.vref / (1 << self.adc_bits)
+        return float(value) * self.v_ref / (1 << self.adc_bits)
 
     def get_value(self):
         reading = self.i2c.read_i2c_block_data(self.i2c_addr, 0x00, 2)
