@@ -8,48 +8,47 @@ import settings
 
 class PumpInterface:
     """
-    Complete stepper pump interface with calibration.
+    Stepper pump interface.
     """
 
-    # Pump properties
-    max_rpm = 180
-    step_angle = 1.8
-
-    # Driver properties
-    wake_up_time = 1e-3
-    microsteps = 8
-
-    @property
-    def max_step_frequency(self):
-        max_rotation_frequency = float(self.max_rpm) / 60
-        steps_per_rotation = 360.0 / self.step_angle * self.microsteps
+    @staticmethod
+    def _get_max_step_frequency(step_angle, microsteps, max_rpm):
+        max_rotation_frequency = float(max_rpm) / 60
+        steps_per_rotation = 360.0 / step_angle * microsteps
         return max_rotation_frequency * steps_per_rotation
 
-    def __init__(self):
-        self.steps_per_litre = settings.PUMP_CALIBRATION['steps_per_litre']
+    def __init__(self, config):
+        self.gpio_sleep = config['gpio_sleep']
+        self.gpio_step = config['gpio_step']
+        self.wake_up_time = config['wake_up_time']
+        self.steps_per_litre = config['steps_per_litre']
+        self.max_step_frequency = self._get_max_step_frequency(
+            step_angle=config['step_angle'],
+            microsteps=config['microsteps'],
+            max_rpm=config['max_rpm'])
 
         GPIO.setmode(GPIO.BCM)
 
-        GPIO.setup(settings.PUMP_GPIO_SLEEP, GPIO.OUT)
-        GPIO.setup(settings.PUMP_GPIO_STEP, GPIO.OUT)
+        GPIO.setup(self.gpio_sleep, GPIO.OUT)
+        GPIO.setup(self.gpio_step, GPIO.OUT)
 
-        GPIO.output(settings.PUMP_GPIO_SLEEP, False)
-        GPIO.output(settings.PUMP_GPIO_STEP, False)
+        GPIO.output(self.gpio_sleep, False)
+        GPIO.output(self.gpio_step, False)
 
     def __del__(self):
         GPIO.cleanup()
 
     def step(self, count):
-        GPIO.output(settings.PUMP_GPIO_SLEEP, True)
+        GPIO.output(self.gpio_sleep, True)
         time.sleep(self.wake_up_time)
 
         for t in range(0, int(count)):
-            GPIO.output(settings.PUMP_GPIO_STEP, True)
+            GPIO.output(self.gpio_step, True)
             time.sleep(0.5 / self.max_step_frequency)
-            GPIO.output(settings.PUMP_GPIO_STEP, False)
+            GPIO.output(self.gpio_step, False)
             time.sleep(0.5 / self.max_step_frequency)
 
-        GPIO.output(settings.PUMP_GPIO_SLEEP, False)
+        GPIO.output(self.gpio_sleep, False)
 
     def pump(self, volume):
         self.step(volume * self.steps_per_litre)
@@ -57,7 +56,7 @@ class PumpInterface:
 
 def main():
     ml = float(sys.argv[1])
-    p = PumpInterface()
+    p = PumpInterface(settings.PUMP)
     p.pump(ml / 1e3)
 
 

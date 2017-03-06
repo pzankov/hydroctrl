@@ -42,10 +42,13 @@ WATER_TANK_CALIBRATION = {
     )
 }
 
-PUMP_GPIO_SLEEP = 17
-PUMP_GPIO_STEP = 27
-
-PUMP_CALIBRATION = {
+PUMP = {
+    'gpio_sleep': 17,
+    'gpio_step': 27,
+    'wake_up_time': 1e-3,
+    'step_angle': 1.8,
+    'microsteps': 8,
+    'max_rpm': 180,
     'steps_per_litre': 8.4e6
 }
 

@@ -30,7 +30,7 @@ class Controller:
         self.scheduler = Scheduler(settings.CONTROLLER_PERIOD_MINUTES, self._do_iteration_nothrow)
         self.temperature = TemperatureInterface()
         self.ph = PHInterface(settings.PH)
-        self.pump = PumpInterface()
+        self.pump = PumpInterface(settings.PUMP)
 
     def run(self):
         # Synchronize clock (we don't have a RTC module)
