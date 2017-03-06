@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
 import settings
-import smbus
-from statistics import mean, pstdev
+from adc import MCP3221, ADCFilter
 from temperature import TemperatureInterface
 
 
@@ -48,7 +47,7 @@ class PHTheory:
 
 class PHCalibration:
     """
-    Parse calibration data.
+    pH electrode calibration.
     """
 
     # Acceptable electrode properties (compared to ideal electrode)
@@ -87,51 +86,6 @@ class PHCalibration:
         return PHTheory.compute_ph(temp, self.offset, self.slope, v)
 
 
-class ADCInterface:
-    """
-    MCP3221 interface.
-    """
-
-    adc_bits = 12
-
-    # Noise filtering
-    filter_samples = 256
-
-    def value_to_voltage(self, value):
-        return float(value) * settings.PH_ADC_V_REF / (1 << self.adc_bits)
-
-    def __init__(self):
-        self.i2c = smbus.SMBus(settings.PH_ADC_I2C_BUSN)
-
-    def _get_value(self):
-        reading = self.i2c.read_i2c_block_data(settings.PH_ADC_I2C_ADDR, 0x00, 2)
-        return (reading[0] << 8) + reading[1]
-
-    def _get_values(self):
-        values = []
-        for n in range(0, self.filter_samples):
-            values.append(self._get_value())
-        return values
-
-    def get_value(self):
-        values = self._get_values()
-        return mean(values)
-
-    def get_voltage(self):
-        value = self.get_value()
-        return self.value_to_voltage(value)
-
-    def get_value_with_stat(self):
-        values = self._get_values()
-        return {'value': mean(values), 'value_dev': pstdev(values)}
-
-    def get_voltage_with_stat(self):
-        data = self.get_value_with_stat()
-        data['voltage'] = self.value_to_voltage(data['value'])
-        data['voltage_dev'] = self.value_to_voltage(data['value_dev'])
-        return data
-
-
 class PHInterface:
     """
     Complete pH electrode interface with
@@ -139,7 +93,10 @@ class PHInterface:
     """
 
     def __init__(self):
-        self.adc = ADCInterface()
+        self.adc = MCP3221(i2c_busn=settings.PH_ADC_I2C_BUSN,
+                           i2c_addr=settings.PH_ADC_I2C_ADDR,
+                           vref=settings.PH_ADC_V_REF)
+        self.adc = ADCFilter(self.adc)
         self.calibration = PHCalibration()
 
     def get_ph(self, temp):
