@@ -115,8 +115,8 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
   - add `set viminfo="/tmp/viminfo"` to `.vimrc`
 - Runtime
   - create file `/etc/modprobe.d/i2c.conf` with line `options i2c_bcm2708 baudrate=100000` to limit the I2C speed
-  - `aptitude install python3 python3-smbus python3-spidev python3-rpi.gpio python3-pip`
-  - `pip3 install gspread oauth2client`
+  - `aptitude install python3 python3-pip libffi-dev`
+  - `pip3 install -r requirements.txt`
   - create a thingspeak channel with same fields order as in `settings.DATA_SPEC` (skip the `date` field).
   Save the channel's write api key to `thingspeak_key.txt`.
   - create a google spreadsheet and remove all rows but the first one.
