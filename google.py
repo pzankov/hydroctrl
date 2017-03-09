@@ -4,7 +4,7 @@ import json
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
-from os import path
+from utils import config_file_path
 import settings
 
 
@@ -20,14 +20,10 @@ class GoogleSheet:
     """
 
     def __init__(self):
-        script_dir = path.dirname(path.abspath(__file__))
-
-        key_path = path.join(script_dir, 'google_key.json')
-        with open(key_path) as f:
+        with open(config_file_path('google_key.json')) as f:
             self.json_key = json.load(f)
 
-        sheet_id_path = path.join(script_dir, 'google_sheet_id.txt')
-        with open(sheet_id_path) as f:
+        with open(config_file_path('google_sheet_id.txt')) as f:
             self.sheet_id = f.read().strip()
 
         self.values = self._get_all_values()

@@ -2,6 +2,7 @@ import time
 import syslog
 import subprocess
 import traceback
+from os import path
 
 
 def log_init():
@@ -71,3 +72,8 @@ def retry(job, error_msg, attempts=3, delay=5, rethrow=True):
 
     if rethrow:
         raise Exception(error_msg)
+
+
+def config_file_path(file_name):
+    script_dir = path.dirname(path.abspath(__file__))
+    return path.join(script_dir, file_name)
