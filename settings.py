@@ -16,18 +16,18 @@ DATA_SPEC = (
     'nutrients_mL'
 )
 
-PH = {
+PH_CONFIG = {
     'adc': {
         'i2c_busn': 1,
         'i2c_addr': 0x4F,
-        'v_ref': 2.5,
-        'v_off': 1.251,
+        'v_ref': 2.5 * UR.V,
+        'v_off': 1.251 * UR.V,
     },
     'calibration': {
-        'temperature': 21.2,
+        'temperature': 21.2 * UR.degC,
         'points': (
-            {'ph': 4.0, 'voltage': 1.418},
-            {'ph': 7.0, 'voltage': 1.224}
+            {'ph': 4.0 * UR.pH, 'v': 1.418 * UR.V},
+            {'ph': 7.0 * UR.pH, 'v': 1.224 * UR.V}
         )
     }
 }
