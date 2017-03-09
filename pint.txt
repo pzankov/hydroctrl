@@ -1,0 +1,2 @@
+# Decimal logarithm of the reciprocal of the hydrogen ion activity
+pH = [pH]
