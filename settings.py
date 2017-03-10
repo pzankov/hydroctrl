@@ -1,10 +1,11 @@
-"""
-Unless otherwise stated, following units are used in this project:
-- length: metre
-- volume: litre
-- temperature: Celsius degree
-- voltage: Volt
-"""
+from pint import UnitRegistry
+from utils import config_file_path
+
+
+# Instantiate a common units registry
+UR = UnitRegistry(autoconvert_offset_to_baseunit=True)
+UR.load_definitions(config_file_path('pint.txt'))
+
 
 # Specify order and name of data columns
 DATA_SPEC = (
