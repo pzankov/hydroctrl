@@ -35,14 +35,14 @@ PH_CONFIG = {
 WATER_TANK_CONFIG = {
 }
 
-PUMP = {
+PUMP_CONFIG = {
     'gpio_sleep': 17,
     'gpio_step': 27,
-    'wake_up_time': 1e-3,
-    'step_angle': 1.8,
-    'microsteps': 8,
-    'max_rpm': 180,
-    'steps_per_litre': 8.4e6
+    'wake_up_time': 1 * UR.ms,
+    'max_frequency': 3 * UR.Hz,
+    'step_angle': 1.8 * UR.deg,
+    'steps_per_volume': 1050 / UR.mL,
+    'microsteps': 8
 }
 
 NUTRIENTS_CONCENTRATION_PER_PH = 1.65e-3
