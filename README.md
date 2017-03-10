@@ -39,8 +39,6 @@ Then, nutrients are added in amount proportional to the difference between actua
 - I2C opto isolation by [Sparky's Widgets](https://www.sparkyswidgets.com/product/i2c-isolation-breakout/)
 - pH electrode with BNC plug
 - DS18B20 temperature sensor
-- JSN-SR04T waterproof ultrasonic distance sensor (fresh water consumption meter)
-- Logic level converter 3.3V-5V (to connect ultrasonic distance sensor)
 - Peristaltic pump with stepper motor (nutrient pump)
 - Big Easy Driver stepper motor driver by [Brian Schmalz](http://www.schmalzhaus.com/BigEasyDriver/)
 - DC-DC step down converter 12V to 5V 5A
@@ -53,7 +51,6 @@ Then, nutrients are added in amount proportional to the difference between actua
 - 1-Wire
   - temperature sensor
 - GPIO
-  - fresh water consumption meter
   - nutrient pump
 
 # Hardware setup
@@ -118,7 +115,7 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
   - add `set viminfo="/tmp/viminfo"` to `.vimrc`
 - Runtime
   - create file `/etc/modprobe.d/i2c.conf` with line `options i2c_bcm2708 baudrate=100000` to limit the I2C speed
-  - `aptitude install python3 python3-smbus python3-spidev python3-rpi.gpio python3-scipy python3-pip`
+  - `aptitude install python3 python3-smbus python3-spidev python3-rpi.gpio python3-pip`
   - `pip3 install gspread oauth2client`
   - create a thingspeak channel with same fields order as in `settings.DATA_SPEC` (skip the `date` field).
   Save the channel's write api key to `thingspeak_key.txt`.

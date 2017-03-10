@@ -31,15 +31,7 @@ PH = {
     }
 }
 
-DISTANCE_METER_GPIO_TRIG = 23
-DISTANCE_METER_GPIO_ECHO = 24
-
-WATER_TANK_CALIBRATION = {
-    'points': (
-        {'distance': 0.8, 'volume': 0},
-        {'distance': 0.5, 'volume': 150},
-        {'distance': 0.25, 'volume': 300},
-    )
+WATER_TANK = {
 }
 
 PUMP = {
