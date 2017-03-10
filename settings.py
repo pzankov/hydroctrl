@@ -32,7 +32,7 @@ PH_CONFIG = {
     }
 }
 
-WATER_TANK = {
+WATER_TANK_CONFIG = {
 }
 
 PUMP = {

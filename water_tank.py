@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import settings
+from settings import UR, WATER_TANK_CONFIG
 
 
 class WaterTankInterface:
@@ -12,15 +12,15 @@ class WaterTankInterface:
         pass
 
     def get_volume(self):
-        return 0
+        return 0 * UR.L
 
 
 def main():
-    tank = WaterTankInterface(settings.WATER_TANK)
+    tank = WaterTankInterface(WATER_TANK_CONFIG)
     while True:
         try:
             volume = tank.get_volume()
-            print('%5.1fL' % volume)
+            print('{:~5.1fP}'.format(volume.to('L')))
         except Exception as e:
             print(e)
 
