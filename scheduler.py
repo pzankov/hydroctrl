@@ -2,6 +2,7 @@
 
 import time
 from datetime import datetime, timedelta
+from settings import UR
 
 
 class Scheduler:
@@ -13,7 +14,8 @@ class Scheduler:
     executed at HH:00, HH:20 and HH:40.
     """
 
-    def __init__(self, period_minutes, job):
+    def __init__(self, period, job):
+        period_minutes = period.m_as('min')
         if not isinstance(period_minutes, int):
             raise Exception('Period must be an integer')
         if period_minutes == 0:
@@ -46,7 +48,7 @@ class Scheduler:
 
 
 def main():
-    s = Scheduler(3, None)
+    s = Scheduler(3 * UR.min, None)
 
     last_run = datetime.now()
     for n in range(1, 3600):
