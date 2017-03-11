@@ -45,14 +45,11 @@ PUMP_CONFIG = {
     'microsteps': 8
 }
 
-NUTRIENTS_CONCENTRATION_PER_PH = 1.65e-3
-
-MIN_PUMPED_NUTRIENTS = 1e-3
-
-DESIRED_PH = 6.0
-
-SOLUTION_VOLUME = 10
-
-PROPORTIONAL_K = 0.5
-
-CONTROLLER_PERIOD_MINUTES = 5
+CONTROLLER_CONFIG = {
+    'nutrients_concentration_per_ph': 1.65 * UR.mL / UR.L / UR.pH,
+    'min_pumped_nutrients': 1 * UR.mL,
+    'desired_ph': 6.0 * UR.pH,
+    'solution_volume': 50 * UR.L,
+    'proportional_k': 0.5,
+    'iteration_period': 5 * UR.min
+}
