@@ -8,7 +8,7 @@ from utils import log_init, log_info, log_warn, log_err, log_exception_trace, wa
 from temperature import TemperatureInterface
 from ph import PHInterface
 from pump import PumpInterface
-import settings
+from settings import UR, PH_CONFIG, PUMP_CONFIG, CONTROLLER_CONFIG
 
 
 class FatalException(Exception):
@@ -24,13 +24,18 @@ class Controller:
     Controller class.
     """
 
-    def __init__(self):
+    def __init__(self, config):
         self.database = None
         self.thingspeak = None
-        self.scheduler = Scheduler(settings.CONTROLLER_PERIOD_MINUTES, self._do_iteration_nothrow)
+        self.scheduler = Scheduler(config['iteration_period'], self._do_iteration_nothrow)
         self.temperature = TemperatureInterface()
-        self.ph = PHInterface(settings.PH)
-        self.pump = PumpInterface(settings.PUMP)
+        self.ph = PHInterface(PH_CONFIG)
+        self.pump = PumpInterface(PUMP_CONFIG)
+        self.nutrients_concentration_per_ph = config['nutrients_concentration_per_ph']
+        self.min_pumped_nutrients = config['min_pumped_nutrients']
+        self.desired_ph = config['desired_ph']
+        self.solution_volume = config['solution_volume']
+        self.proportional_k = config['proportional_k']
 
     def run(self):
         # Synchronize clock (we don't have a RTC module)
@@ -43,17 +48,17 @@ class Controller:
         # Enter the control loop
         self.scheduler.run()
 
-    def _estimate_nutrients(self, pH):
-        if pH < settings.DESIRED_PH:
-            return 0
+    def _estimate_nutrients(self, ph):
+        if ph < self.desired_ph:
+            return 0 * UR.L
 
-        nutrients_per_pH = settings.NUTRIENTS_CONCENTRATION_PER_PH * settings.SOLUTION_VOLUME
-        pH_error = pH - settings.DESIRED_PH
+        nutrients_per_ph = self.nutrients_concentration_per_ph * self.solution_volume
+        ph_error = ph - self.desired_ph
 
-        nutrients = nutrients_per_pH * pH_error * settings.PROPORTIONAL_K
+        nutrients = nutrients_per_ph * ph_error * self.proportional_k
 
-        if nutrients < settings.MIN_PUMPED_NUTRIENTS:
-            return 0
+        if nutrients < self.min_pumped_nutrients:
+            return 0 * UR.L
 
         return nutrients
 
@@ -63,17 +68,17 @@ class Controller:
         date = datetime.utcnow()
 
         temperature = self.temperature.get_temperature()
-        pH = self.ph.get_ph(temperature)
-        tank_volume = 250
+        ph = self.ph.get_ph(temperature).value
+        tank_volume = 250 * UR.L
 
-        nutrients = self._estimate_nutrients(pH)
+        nutrients = self._estimate_nutrients(ph)
 
         data = {
             'date': date.strftime('%Y-%m-%dT%H:%M:%SZ'),
-            'temperature_C': '%.1f' % temperature,
-            'pH': '%.2f' % pH,
-            'water_tank_L': '%.0f' % tank_volume,
-            'nutrients_mL': '%.1f' % (nutrients * 1e3)
+            'temperature_C': '%.1f' % temperature.m_as('degC'),
+            'pH': '%.2f' % ph.m_as('pH'),
+            'water_tank_L': '%.0f' % tank_volume.m_as('L'),
+            'nutrients_mL': '%.1f' % nutrients.m_as('mL')
         }
 
         retry(lambda: self.database.append(data), 'Database append failed')
@@ -101,7 +106,7 @@ def main():
     log_info('Starting controller')
 
     try:
-        ctrl = Controller()
+        ctrl = Controller(CONTROLLER_CONFIG)
         ctrl.run()
 
         log_err('Controller stopped running')

@@ -3,8 +3,8 @@
 import urllib.request
 import urllib.parse
 import urllib.error
-from os import path
 from datetime import datetime
+from utils import config_file_path
 import settings
 
 
@@ -14,10 +14,7 @@ class Thingspeak:
     """
 
     def __init__(self):
-        script_dir = path.dirname(path.abspath(__file__))
-        key_path = path.join(script_dir, 'thingspeak_key.txt')
-
-        with open(key_path) as f:
+        with open(config_file_path('thingspeak_key.txt')) as f:
             self.key = f.read().strip()
 
     def append(self, data):

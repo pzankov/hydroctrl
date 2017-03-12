@@ -1,0 +1,7 @@
+smbus-cffi
+spidev
+rpi.gpio
+uncertainties
+pint
+oauth2client
+gspread

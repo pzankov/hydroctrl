@@ -2,6 +2,7 @@
 
 import glob
 from os import path
+from settings import UR
 
 
 class TemperatureInterface:
@@ -29,7 +30,9 @@ class TemperatureInterface:
             raise Exception('CRC check failed')
 
         value = lines[1][lines[1].rindex('=') + 1:]
-        return int(value) / 1e3
+        temp_C = int(value) / 1000.0
+
+        return temp_C * UR.degC
 
 
 def main():
