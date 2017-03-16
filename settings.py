@@ -39,10 +39,10 @@ PUMP_CONFIG = {
     'gpio_sleep': 17,
     'gpio_step': 27,
     'wake_up_time': 1 * UR.ms,
-    'max_frequency': 3 * UR.Hz,
+    'max_frequency': 1 * UR.Hz,
     'step_angle': 1.8 * UR.deg,
     'steps_per_volume': 1050 / UR.mL,
-    'microsteps': 8
+    'microsteps': 16
 }
 
 CONTROLLER_CONFIG = {
