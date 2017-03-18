@@ -36,15 +36,25 @@ class PumpInterface:
     def __del__(self):
         GPIO.cleanup()
 
+    @staticmethod
+    def sleep(secs):
+        start = time.monotonic()
+        while secs > 0:
+            end = time.monotonic()
+            secs -= end - start
+            start = end
+
     def step(self, count):
         GPIO.output(self.gpio_sleep, True)
         time.sleep(self.wake_up_time_s)
 
+        delay_s = 0.5 * self.step_period_s / self.microsteps
+
         for t in range(0, int(count * self.microsteps)):
             GPIO.output(self.gpio_step, True)
-            time.sleep(0.5 * self.step_period_s / self.microsteps)
+            self.sleep(delay_s)
             GPIO.output(self.gpio_step, False)
-            time.sleep(0.5 * self.step_period_s / self.microsteps)
+            self.sleep(delay_s)
 
         GPIO.output(self.gpio_sleep, False)
 
