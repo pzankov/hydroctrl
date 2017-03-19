@@ -3,6 +3,8 @@
 This is a repo of the nutrient solution controller.
 The goal is to continuously monitor and adjust the solution state.
 
+NOTE: Software is not functional yet, please wait until development is finished.
+
 # Hydroponic system
 
 Recirculating hydroponic system consists of solution tank and a fresh water tank.
