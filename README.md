@@ -5,14 +5,16 @@ The goal is to continuously monitor and adjust the solution state.
 
 # Hydroponic system
 
-Recirculating hydroponic system consists of a single tank which is used to both mix and hold the solution.
-Solution consumed by plants is continuously replaced with a fresh water (through a float valve).
+Recirculating hydroponic system consists of solution tank and a fresh water tank.
+Solution tank is used to both mix and hold the solution.
+Solution consumed by plants is continuously replaced with a fresh water from the fresh water tank through a float valve.
 
 # Sensors
 
-Following data will be obtained by the controller:
+Following data is obtained by the controller:
 - temperature of solution
 - pH of solution
+- solution level (with a single float switch)
 - consumption of fresh water (to detect leaks)
 
 # Data storage
@@ -39,6 +41,7 @@ Then, nutrients are added in amount proportional to the difference between actua
 - I2C opto isolation by [Sparky's Widgets](https://www.sparkyswidgets.com/product/i2c-isolation-breakout/)
 - pH electrode with BNC plug
 - DS18B20 temperature sensor
+- Float switch for solution tank
 - Peristaltic pump with stepper motor (nutrient pump)
 - Big Easy Driver stepper motor driver by [Brian Schmalz](http://www.schmalzhaus.com/BigEasyDriver/)
 - DC-DC step down converter 12V to 5V 5A
@@ -52,6 +55,7 @@ Then, nutrients are added in amount proportional to the difference between actua
   - temperature sensor
 - GPIO
   - nutrient pump
+  - float switch
 
 # Hardware setup
 

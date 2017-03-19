@@ -35,6 +35,11 @@ PH_CONFIG = {
 WATER_TANK_CONFIG = {
 }
 
+SOLUTION_TANK_CONFIG = {
+    'gpio_float_switch': 22,
+    'float_switch_state_when_full': 0
+}
+
 PUMP_CONFIG = {
     'gpio_sleep': 17,
     'gpio_step': 27,

@@ -12,3 +12,6 @@ RPi      Sensor
 11 BCM17 Pump SLEEP
 13 BCM27 Pump STEP
 14 GND   Pump GND
+
+15 BCM22 FloatSwitch
+25 GND   FloatSwitch
