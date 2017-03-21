@@ -9,7 +9,7 @@ from temperature import TemperatureInterface
 from ph import PHInterface
 from pump import PumpInterface
 from solution_tank import SolutionTankInterface
-from settings import UR, PH_CONFIG, PUMP_CONFIG, CONTROLLER_CONFIG, SOLUTION_TANK_CONFIG
+from settings import UR, CONTROLLER_CONFIG, PH_CONFIG, PUMP_CONFIG, SOLUTION_TANK_CONFIG
 
 
 class FatalException(Exception):
@@ -25,14 +25,14 @@ class Controller:
     Controller class.
     """
 
-    def __init__(self, config):
+    def __init__(self, config, ph_config, pump_config, solution_tank_config):
         self.database = None
         self.thingspeak = None
-        self.scheduler = Scheduler(config['iteration_period'], self._do_iteration_nothrow)
         self.temperature = TemperatureInterface()
-        self.ph = PHInterface(PH_CONFIG)
-        self.pump = PumpInterface(PUMP_CONFIG)
-        self.solution_tank = SolutionTankInterface(SOLUTION_TANK_CONFIG)
+        self.ph = PHInterface(ph_config)
+        self.pump = PumpInterface(pump_config)
+        self.solution_tank = SolutionTankInterface(solution_tank_config)
+        self.scheduler = Scheduler(config['iteration_period'], self._do_iteration_nothrow)
         self.nutrients_concentration_per_ph = config['nutrients_concentration_per_ph']
         self.min_pumped_nutrients = config['min_pumped_nutrients']
         self.desired_ph = config['desired_ph']
@@ -112,7 +112,7 @@ def main():
     log_info('Starting controller')
 
     try:
-        ctrl = Controller(CONTROLLER_CONFIG)
+        ctrl = Controller(CONTROLLER_CONFIG, PH_CONFIG, PUMP_CONFIG, SOLUTION_TANK_CONFIG)
         ctrl.run()
 
         log_err('Controller stopped running')
