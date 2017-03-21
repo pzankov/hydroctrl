@@ -8,7 +8,8 @@ from utils import log_init, log_info, log_warn, log_err, log_exception_trace, wa
 from temperature import TemperatureInterface
 from ph import PHInterface
 from pump import PumpInterface
-from settings import UR, PH_CONFIG, PUMP_CONFIG, CONTROLLER_CONFIG
+from solution_tank import SolutionTankInterface
+from settings import UR, PH_CONFIG, PUMP_CONFIG, CONTROLLER_CONFIG, SOLUTION_TANK_CONFIG
 
 
 class FatalException(Exception):
@@ -31,6 +32,7 @@ class Controller:
         self.temperature = TemperatureInterface()
         self.ph = PHInterface(PH_CONFIG)
         self.pump = PumpInterface(PUMP_CONFIG)
+        self.solution_tank = SolutionTankInterface(SOLUTION_TANK_CONFIG)
         self.nutrients_concentration_per_ph = config['nutrients_concentration_per_ph']
         self.min_pumped_nutrients = config['min_pumped_nutrients']
         self.desired_ph = config['desired_ph']
@@ -64,6 +66,10 @@ class Controller:
 
     def _do_iteration(self):
         log_info('Starting a new iteration')
+
+        # Something must be wrong if solution tank is not full
+        if not self.solution_tank.is_full():
+            raise Exception('Solution tank is not full')
 
         date = datetime.utcnow()
 
