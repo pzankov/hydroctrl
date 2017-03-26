@@ -1,9 +1,9 @@
 RPi      Sensor
 
-5 SCL    pH   SCL
-3 SDA    pH   SDA
-1 3V3    pH   3V3
-6 GND    pH   GND
+5 SCL    pH, pressure
+3 SDA    pH, pressure
+1 3V3    pH, pressure
+6 GND    pH, pressure
 
 1 3V3    Temp VCC
 9 GND    Temp GND

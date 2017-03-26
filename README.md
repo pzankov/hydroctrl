@@ -70,6 +70,10 @@ If there are no new records appearing in the database, connect to the controller
 - Nutrient pump
   - Peristaltic pump with stepper motor (nutrient pump)
   - Big Easy Driver stepper motor driver by [Brian Schmalz](http://www.schmalzhaus.com/BigEasyDriver/)
+- Water consumption
+  - MP3V5050DP pressure sensor
+  - REF3030 voltage reference (to supply the sensor)
+  - ADS1115 ADC board
 - Supply
   - DC-DC step down converter 12V to 5V 5A
   - 12V power supply
@@ -78,6 +82,7 @@ If there are no new records appearing in the database, connect to the controller
 
 - I2C
   - pH meter
+  - pressure sensor
 - 1-Wire
   - temperature sensor
 - GPIO
@@ -97,6 +102,7 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
     - Solder a voltage reference IC (e.g. REF3025)
     - Solder a 3.3V jumper on the I2C opto isolation
 - Solder power supply wires directly to RPi board (Micro USB plug is not reliable).
+- Pressure sensor is ratiometric and must be supplied with a stabilized 3.0V voltage.
 
 # Software setup
 
