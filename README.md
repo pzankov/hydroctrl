@@ -59,16 +59,19 @@ If there are no new records appearing in the database, connect to the controller
 # Hardware
 
 - Raspberry Pi
-- MinipH pH interface by [Sparky's Widgets](https://www.sparkyswidgets.com/product/miniph/)
-  (note: voltage reference IC has to be soldered manually)
-- I2C opto isolation by [Sparky's Widgets](https://www.sparkyswidgets.com/product/i2c-isolation-breakout/)
-- pH electrode with BNC plug
+- pH
+  - MinipH pH interface by [Sparky's Widgets](https://www.sparkyswidgets.com/product/miniph/)
+    (note: voltage reference IC has to be soldered manually)
+  - I2C opto isolation by [Sparky's Widgets](https://www.sparkyswidgets.com/product/i2c-isolation-breakout/)
+  - pH electrode with BNC plug
 - DS18B20 temperature sensor
 - Float switch for solution tank
-- Peristaltic pump with stepper motor (nutrient pump)
-- Big Easy Driver stepper motor driver by [Brian Schmalz](http://www.schmalzhaus.com/BigEasyDriver/)
-- DC-DC step down converter 12V to 5V 5A
-- 12V power supply
+- Nutrient pump
+  - Peristaltic pump with stepper motor (nutrient pump)
+  - Big Easy Driver stepper motor driver by [Brian Schmalz](http://www.schmalzhaus.com/BigEasyDriver/)
+- Supply
+  - DC-DC step down converter 12V to 5V 5A
+  - 12V power supply
 
 # Bus usage
 
