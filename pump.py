@@ -2,7 +2,7 @@
 
 import sys
 import RPi.GPIO as GPIO
-import time
+from utils import delay
 from settings import UR, PUMP_CONFIG
 
 
@@ -36,25 +36,17 @@ class PumpInterface:
     def __del__(self):
         GPIO.cleanup()
 
-    @staticmethod
-    def sleep(secs):
-        start = time.monotonic()
-        while secs > 0:
-            end = time.monotonic()
-            secs -= end - start
-            start = end
-
     def step(self, count):
         GPIO.output(self.gpio_sleep, True)
-        time.sleep(self.wake_up_time_s)
+        delay(self.wake_up_time_s)
 
         delay_s = 0.5 * self.step_period_s / self.microsteps
 
         for t in range(0, int(count * self.microsteps)):
             GPIO.output(self.gpio_step, True)
-            self.sleep(delay_s)
+            delay(delay_s)
             GPIO.output(self.gpio_step, False)
-            self.sleep(delay_s)
+            delay(delay_s)
 
         GPIO.output(self.gpio_sleep, False)
 
