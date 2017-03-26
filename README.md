@@ -62,6 +62,7 @@ If there are no new records appearing in the database, connect to the controller
 - pH
   - MinipH pH interface by [Sparky's Widgets](https://www.sparkyswidgets.com/product/miniph/)
     (note: voltage reference IC has to be soldered manually)
+  - REF3025 voltage reference (if not present on the interface)
   - I2C opto isolation by [Sparky's Widgets](https://www.sparkyswidgets.com/product/i2c-isolation-breakout/)
   - pH electrode with BNC plug
 - DS18B20 temperature sensor
