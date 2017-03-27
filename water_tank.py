@@ -34,25 +34,47 @@ class LinearInterpolation:
         return y1 + (x_new - x1) / (x2 - x1) * (y2 - y1)
 
 
-class PressureInterface:
+class PressureSensorCalibration:
     """
-    MP3V5050DP pressure sensor interface.
+    MP3V5050DP pressure sensor calibration.
     """
-
-    # ADC data rate
-    adc_sps = 64
 
     sensitivity = 54 * UR.mV / UR.kPa
 
-    def __init__(self, i2c_busn, i2c_addr, adc_channel, adc_fsr, pressure_offset):
-        self.adc = ADS1115(i2c_busn, i2c_addr)
-        self.adc.config(adc_channel, adc_fsr, self.adc_sps)
-        self.adc = ADCFilter(self.adc, samples_count=self.adc_sps)
+    def __init__(self, pressure_offset):
         self.pressure_offset = pressure_offset
+
+    def compute_pressure(self, voltage):
+        return voltage / self.sensitivity - self.pressure_offset
+
+
+class PressureSensorInterface:
+    """
+    Complete MP3V5050DP pressure sensor interface with calibration.
+    """
+
+    def __init__(self, config):
+        adc_sps = config['adc']['sps']
+
+        adc = ADS1115(
+            i2c_busn=config['adc']['i2c_busn'],
+            i2c_addr=config['adc']['i2c_addr'])
+
+        adc.config(
+            channel=config['adc']['channel'],
+            fsr=config['adc']['fsr'],
+            sps=adc_sps)
+
+        self.adc = ADCFilter(
+            adc=adc,
+            samples_count=adc_sps)
+
+        self.calibration = PressureSensorCalibration(
+            pressure_offset=config['calibration']['pressure_offset'])
 
     def get_pressure_and_voltage(self):
         voltage = self.adc.get_voltage()
-        pressure = voltage / self.sensitivity - self.pressure_offset
+        pressure = self.calibration.compute_pressure(voltage)
         return pressure, voltage
 
     def get_pressure(self):
