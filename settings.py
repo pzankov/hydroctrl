@@ -22,6 +22,7 @@ PH_CONFIG = {
         'i2c_addr': 0x4F,
         'v_ref': 2.5 * UR.V,
         'v_off': 1.251 * UR.V,
+        'filter_samples': 256
     },
     'calibration': {
         'temperature': 21.2 * UR.degC,

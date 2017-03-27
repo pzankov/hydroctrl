@@ -118,7 +118,7 @@ class ADCFilter:
     ADC noise filtering.
     """
 
-    def __init__(self, adc, samples_count=256):
+    def __init__(self, adc, samples_count):
         self.adc = adc
         self.samples_count = samples_count
 

@@ -102,7 +102,9 @@ class PHInterface:
             i2c_addr=config['adc']['i2c_addr'],
             v_ref=config['adc']['v_ref'])
 
-        self.adc = ADCFilter(adc)
+        self.adc = ADCFilter(
+            adc=adc,
+            samples_count=config['adc']['filter_samples'])
 
         self.calibration = PHCalibration(
             adc_offset=config['adc']['v_off'],
