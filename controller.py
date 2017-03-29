@@ -38,6 +38,7 @@ class Controller:
         self.desired_ph = config['desired_ph']
         self.solution_volume = config['solution_volume']
         self.proportional_k = config['proportional_k']
+        self.solution_tank_is_full = True
 
     def run(self):
         # Synchronize clock (we don't have a RTC module)
@@ -67,9 +68,17 @@ class Controller:
     def _do_iteration(self):
         log_info('Starting a new iteration')
 
-        # Something must be wrong if solution tank is not full
-        if not self.solution_tank.is_full():
-            raise Exception('Solution tank is not full')
+        solution_tank_was_full = self.solution_tank_is_full
+        self.solution_tank_is_full = self.solution_tank.is_full()
+
+        # Solution tank is empty. Volume is unknown and pH sensor can be dry.
+        if not self.solution_tank_is_full:
+            raise Exception('Solution tank is empty, skipping this iteration')
+
+        # Solution tank has been empty for a while.
+        # Skip one more iteration to let the pH readings stabilize.
+        if not solution_tank_was_full:
+            raise Exception('Solution tank has just became full, skipping one more iteration')
 
         date = datetime.utcnow()
 
