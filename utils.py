@@ -77,3 +77,7 @@ def retry(job, error_msg, attempts=3, delay=5, rethrow=True):
 def config_file_path(file_name):
     script_dir = path.dirname(path.abspath(__file__))
     return path.join(script_dir, file_name)
+
+
+def in_range(value, range):
+    return min(range) <= value <= max(range)

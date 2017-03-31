@@ -4,7 +4,8 @@ from datetime import datetime
 from google import GoogleSheet
 from thingspeak import Thingspeak
 from scheduler import Scheduler
-from utils import log_init, log_info, log_warn, log_err, log_exception_trace, wait_for_ntp, retry
+from utils import log_init, log_info, log_warn, log_err, log_exception_trace
+from utils import wait_for_ntp, retry, in_range
 from temperature import TemperatureInterface
 from ph import PHInterface
 from pump import PumpInterface
@@ -33,6 +34,9 @@ class Controller:
         self.pump = PumpInterface(pump_config)
         self.solution_tank = SolutionTankInterface(solution_tank_config)
         self.scheduler = Scheduler(config['iteration_period'], self._do_iteration_nothrow)
+        self.valid_ph_range = config['valid_ph_range']
+        self.valid_temperature_range = config['valid_temperature_range']
+        self.valid_supply_tank_volume_range = config['valid_supply_tank_volume_range']
         self.nutrients_concentration_per_ph = config['nutrients_concentration_per_ph']
         self.min_pumped_nutrients = config['min_pumped_nutrients']
         self.desired_ph = config['desired_ph']
@@ -68,23 +72,31 @@ class Controller:
     def _do_iteration(self):
         log_info('Starting a new iteration')
 
+        date = datetime.utcnow()
+
+        # Update the solution tank state
         solution_tank_was_full = self.solution_tank_is_full
         self.solution_tank_is_full = self.solution_tank.is_full()
 
-        # Solution tank is empty. Volume is unknown and pH sensor can be dry.
+        # Volume is unknown and pH sensor can be dry.
         if not self.solution_tank_is_full:
-            raise Exception('Solution tank is empty, skipping this iteration')
+            raise Exception('Solution tank is empty')
 
-        # Solution tank has been empty for a while.
         # Skip one more iteration to let the pH readings stabilize.
         if not solution_tank_was_full:
-            raise Exception('Solution tank has just became full, skipping one more iteration')
-
-        date = datetime.utcnow()
+            raise Exception('Solution tank has been empty for a while')
 
         temperature = self.temperature.get_temperature()
+        if not in_range(temperature, self.valid_temperature_range):
+            raise FatalException('Invalid temperature: {:~.3gP}'.format(temperature))
+
         ph = self.ph.get_ph(temperature).value
-        tank_volume = 250 * UR.L
+        if not in_range(ph, self.valid_ph_range):
+            raise FatalException('Invalid pH: {:~.3gP}'.format(ph))
+
+        supply_tank_volume = 250 * UR.L
+        if not in_range(supply_tank_volume, self.valid_supply_tank_volume_range):
+            raise FatalException('Invalid supply tank volume: {:~.3gP}'.format(supply_tank_volume))
 
         nutrients = self._estimate_nutrients(ph)
 
@@ -92,7 +104,7 @@ class Controller:
             'date': date.strftime('%Y-%m-%dT%H:%M:%SZ'),
             'temperature_C': '%.1f' % temperature.m_as('degC'),
             'pH': '%.2f' % ph.m_as('pH'),
-            'water_tank_L': '%.0f' % tank_volume.m_as('L'),
+            'water_tank_L': '%.0f' % supply_tank_volume.m_as('L'),
             'nutrients_mL': '%.1f' % nutrients.m_as('mL')
         }
 
