@@ -51,7 +51,7 @@ class Thingspeak:
 def main():
     t = Thingspeak()
     date = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
-    t.append({'date': date, 'temperature_C': 25, 'pH': 6.0, 'water_tank_L': 250, 'nutrients_mL': 0})
+    t.append({'date': date, 'temperature_C': 25, 'pH': 6.0, 'supply_tank_L': 250, 'nutrients_mL': 0})
 
 
 if __name__ == '__main__':

@@ -104,7 +104,7 @@ class Controller:
             'date': date.strftime('%Y-%m-%dT%H:%M:%SZ'),
             'temperature_C': '%.1f' % temperature.m_as('degC'),
             'pH': '%.2f' % ph.m_as('pH'),
-            'water_tank_L': '%.0f' % supply_tank_volume.m_as('L'),
+            'supply_tank_L': '%.0f' % supply_tank_volume.m_as('L'),
             'nutrients_mL': '%.1f' % nutrients.m_as('mL')
         }
 
