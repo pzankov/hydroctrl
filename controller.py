@@ -33,7 +33,7 @@ class Controller:
         self.ph = PHInterface(ph_config)
         self.pump = PumpInterface(pump_config)
         self.solution_tank = SolutionTankInterface(solution_tank_config)
-        self.scheduler = Scheduler(config['iteration_period'], self._do_iteration_nothrow)
+        self.scheduler = Scheduler(config['iteration_period'], self._do_iteration_throw_only_fatal)
         self.valid_ph_range = config['valid_ph_range']
         self.valid_temperature_range = config['valid_temperature_range']
         self.valid_supply_tank_volume_range = config['valid_supply_tank_volume_range']
@@ -116,7 +116,7 @@ class Controller:
         # We only add nutrients after their amount was logged to DB
         self.pump.pump(nutrients)
 
-    def _do_iteration_nothrow(self):
+    def _do_iteration_throw_only_fatal(self):
         try:
             self._do_iteration()
         except FatalException:
