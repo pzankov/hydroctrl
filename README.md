@@ -35,6 +35,24 @@ This controller implements a discrete proportional regulation algorithm.
 At each iteration, a pH state of the solution is measured.
 Then, nutrients are added in amount proportional to the difference between actual and desired pH.
 
+# Error handling
+
+If an error happens during the initialisation stage it will lead to the program termination.
+
+After controller has entered the iteration loop, only a specific set of errors will
+cause the program termination (fatal errors).
+This is done to avoid denial of service in a case of transient errors, e.g. network issues.
+
+A fatal error will be thrown if there is a chance that controller state can become inconsistent
+or there are other factors that can lead to a crop loss (e.g. if pH is out of a reasonable range
+or a water leak was detected).
+
+# Monitoring
+
+Properly operating controller will submit results to the database on a strict schedule.
+Error happening during iteration will lead to a missing record in a database.
+In case of a fatal error controller will terminate and no new records will appear in the database.
+
 # Hardware
 
 - Raspberry Pi
