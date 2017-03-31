@@ -138,7 +138,7 @@ def main():
 
         log_err('Controller stopped running')
     except Exception as e:
-        log_err('Unexpected exception: ' + str(e))
+        log_err(str(e))
         log_exception_trace()
 
 
