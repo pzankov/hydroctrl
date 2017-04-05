@@ -181,7 +181,6 @@ This can be useful in case of network problems.
     ```
     [General]
     Name = Hydroctrl
-    DisablePlugins = pnat
     ```
 
   - create a special user
