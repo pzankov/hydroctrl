@@ -168,3 +168,49 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
 ## Notes
 
 Use `logread` to see syslog messages.
+
+## Bluetooth terminal
+
+RPi can be configured to provide a terminal over Bluetooth.
+This can be useful in case of network problems.
+
+- Setup RPi
+  - `aptitude install pi-bluetooth bluez bluez-firmware picocom`
+  - edit `/etc/bluetooth/main.conf`
+
+    ```
+    [General]
+    Name = Hydroctrl
+    DisablePlugins = pnat
+    ```
+
+  - create a special user
+    - `useradd -m mon`
+    - `passwd mon`
+  - edit `/etc/rc.local`
+
+    ```
+    BT_ATTEMPTS=60
+    while [ $BT_ATTEMPTS -gt 0 ]; do
+      if hciconfig hci0; then
+        hciconfig hci0 sspmode 1
+        hciconfig hci0 piscan
+        rfcomm watch /dev/rfcomm0 0 /sbin/agetty rfcomm0 linux 115200 &
+        break
+      fi
+      BT_ATTEMPTS=$((BT_ATTEMPTS-1))
+      echo "$BT_ATTEMPTS attempts left"
+      sleep 1
+    done
+    ```
+
+  - reboot
+- Connect from PC
+    - `bluetoothctl`
+      - `scan on`
+      - wait for the RPi to appear
+      - `pair RPI_ADDR`
+      - `quit`
+    - `rfcomm connect hci0 RPI_ADDR &`
+    - `picocom /dev/rfcomm0`
+    - login as user `mon`
