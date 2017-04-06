@@ -98,10 +98,10 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
 
 - OS installation and basic setup
   - dd [Raspbian image](https://www.raspberrypi.org/downloads/raspbian/) to SD flash
-  - Create empty file `ssh` on the boot partition (enable ssh server)
-  - Connect Pi to the ethernet cable and power it on
-  - Discover raspberry with `arp-scan -l`
-  - Connect via ssh (user `pi`, password `raspberry`)
+  - create empty file `ssh` on the boot partition (enable ssh server)
+  - connect Pi to the ethernet cable and power it on
+  - discover raspberry with `arp-scan -l`
+  - connect via ssh (user `pi`, password `raspberry`)
   - `aptitude update && aptitude upgrade`
   - `aptitude install vim`
   - edit `/etc/wpa_supplicant/wpa_supplicant.conf` (configure WiFi)
@@ -143,7 +143,6 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
     iface wlan0 inet manual
         wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
         wireless-power off
-
     ```
 
     Make sure power management is off after reboot (check with `iwconfig`).
