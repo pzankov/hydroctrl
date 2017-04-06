@@ -203,7 +203,7 @@ RPi can be configured to provide a terminal over Bluetooth.
 Use this if you want to check syslog when network is down (and you are too lazy to solder UART).
 
 - Setup RPi
-  - `aptitude install pi-bluetooth bluez bluez-firmware picocom`
+  - `aptitude install pi-bluetooth bluez bluez-firmware`
   - edit `/etc/bluetooth/main.conf`
 
     ```
@@ -234,13 +234,12 @@ Use this if you want to check syslog when network is down (and you are too lazy 
 
   - reboot
 - Connect from PC
-    - `bluetoothctl`
-      - `scan on`
-      - wait for the RPi to appear
-      - `pair RPI_ADDR`
-      - `quit`
+    - allow Bluetooth usage without sudo
+      - `sudo chmod u+s /usr/bin/rfcomm`
+      - `sudo apt-get remove modemmanager` (ModemManager opens /dev/rfcomm0 and interferes with minicom)
+      - check you are in the `dialout` group
     - `rfcomm connect hci0 RPI_ADDR &`
-    - `picocom /dev/rfcomm0`
+    - `minicom -D /dev/rfcomm0` (do not use `picocom` - it gets stuck sending `^J` character)
     - login as user `mon`
 
 # Dev tools
