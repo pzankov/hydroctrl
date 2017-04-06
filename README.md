@@ -47,11 +47,14 @@ A fatal error will be thrown if there is a chance that controller state can beco
 or there are other factors that can lead to a crop loss (e.g. if pH is out of a reasonable range
 or a water leak was detected).
 
+All errors are reported to syslog and can be viewed with `logread`.
+Error history will be kept in RAM until next reboot.
+There is no cheap reliable way to save log in a persistent storage.
+
 # Monitoring
 
 Properly operating controller will submit results to the database on a strict schedule.
-Error happening during iteration will lead to a missing record in a database.
-In case of a fatal error controller will terminate and no new records will appear in the database.
+If there are no new records appearing in the database, connect to the controller and check syslog for errors.
 
 # Hardware
 
@@ -95,12 +98,13 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
 
 - OS installation and basic setup
   - dd [Raspbian image](https://www.raspberrypi.org/downloads/raspbian/) to SD flash
-  - Create file with name `ssh` on boot partition
+  - Create empty file `ssh` on the boot partition (enable ssh server)
   - Connect Pi to the ethernet cable and power it on
   - Discover raspberry with `arp-scan -l`
-  - Connect via ssh with user `pi` and password `raspberry`
+  - Connect via ssh (user `pi`, password `raspberry`)
+  - `aptitude update && aptitude upgrade`
   - `aptitude install vim`
-  - `vi /etc/wpa_supplicant/wpa_supplicant.conf`, then add
+  - edit `/etc/wpa_supplicant/wpa_supplicant.conf` (configure WiFi)
 
     ```
     network={
@@ -117,28 +121,68 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
     - Advanced Options
       - Enable SPI
       - Enable I2C
-  - add `dtoverlay=w1-gpio` to `/boot/config.txt`
-  - `aptitude update && aptitude upgrade`
-  - `vi .ssh/authorized_keys` and paste your public ssh key
+  - edit `/boot/config.txt` (enable 1-Wire)
+
+    ```
+    dtoverlay=w1-gpio
+    ```
+
+  - edit `/etc/modprobe.d/i2c.conf` (limit I2C speed)
+
+    ```
+    options i2c_bcm2708 baudrate=100000
+    ```
+
+  - paste your public ssh key into `.ssh/authorized_keys`
   - `usermod --lock pi` (disable login with password)
   - `dpkg-reconfigure tzdata` (set time zone)
-  - `vi /etc/network/interfaces` and add `wireless-power off` for `wlan0`,
-  then make sure power management is off in `iwconfig` after reboot
+  - edit `/etc/network/interfaces` (disable WiFi power management)
+
+    ```
+    allow-hotplug wlan0
+    iface wlan0 inet manual
+        wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+        wireless-power off
+
+    ```
+
+    Make sure power management is off after reboot (check with `iwconfig`).
 - Switch to readonly FS
   - follow [these instructions](https://hallard.me/raspberry-pi-read-only/)
   - `aptitude purge fake-hwclock`
-  - add `chmod 1777 /tmp` to `/etc/rc.local`
-  - add these to `/etc/rc.local` (fix ntp trying to create temp file in `/var/lib/ntp/`)
+  - edit `/etc/rc.local`
 
     ```
+    # fix tmpfs permissions
+    chmod 1777 /tmp
+
+    # fix ntp trying to create a temp file in /var/lib/ntp/
     mkdir -p /tmp/ntpfs/upper /tmp/ntpfs/work
     mount -t overlay overlay -olowerdir=/var/lib/ntp/,upperdir=/tmp/ntpfs/upper,workdir=/tmp/ntpfs/work /var/lib/ntp
     chown ntp:ntp /var/lib/ntp
     ```
 
-  - add `set viminfo="/tmp/viminfo"` to `.vimrc`
+  - edit `.vimrc`
+
+    ```
+    set viminfo="/tmp/viminfo"
+    ```
+
+  - create scripts to manually remount FS: `/usr/bin/rw`
+
+    ```
+    #!/bin/sh
+    sudo mount -o remount,rw /
+    ```
+
+    and `/usr/bin/ro`
+
+    ```
+    #!/bin/sh
+    sudo mount -o remount,ro /
+    ```
+
 - Runtime
-  - create file `/etc/modprobe.d/i2c.conf` with line `options i2c_bcm2708 baudrate=100000` to limit the I2C speed
   - `aptitude install python3 python3-pip libffi-dev`
   - `pip3 install -r requirements.txt`
   - create a thingspeak channel with same fields order as in `settings.DATA_SPEC` (skip the `date` field).
@@ -148,31 +192,16 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
   - obtain google credentials for [gspread](https://github.com/burnash/gspread) as described [here](http://gspread.readthedocs.io/en/latest/oauth2.html).
   Don't forget to share the spreadsheet with the email specified in `json_key['client_email']`.
   Save credentials to `google_key.json`.
-  - finally, add `su -c /path/to/controller.py pi &` to `/etc/rc.local`
+  - edit `/etc/rc.local`
 
-# Dev tools
+    ```
+    su -c /home/pi/PROJECT_PATH/controller.py pi &
+    ```
 
-## Software
-
-  - `aptitude install git tig`
-  - `aptitude install vim-python-jedi`
-  - `vim-addons install python-jedi`
-  - `aptitude install fish`
-  - take vim/git/fish config from [this repo](https://github.com/pzankov/cfg)
-  - `vi /etc/locale.gen`, then uncomment `en_US.UTF-8`, then run `locale-gen`
-  - `aptitude install ipython3`
-  - `aptitude install time`
-  - `aptitude install wcalc`
-  - create scripts `/usr/bin/rw` and `/usr/bin/ro` with commands `sudo mount -o remount,rw /` and `sudo mount -o remount,ro /`
-
-## Notes
-
-Use `logread` to see syslog messages.
-
-## Bluetooth terminal
+# Bluetooth terminal
 
 RPi can be configured to provide a terminal over Bluetooth.
-This can be useful in case of network problems.
+Use this if you want to check syslog when network is down (and you are too lazy to solder UART).
 
 - Setup RPi
   - `aptitude install pi-bluetooth bluez bluez-firmware picocom`
@@ -189,6 +218,7 @@ This can be useful in case of network problems.
   - edit `/etc/rc.local`
 
     ```
+    # Bluetooth is not available right after reboot
     BT_ATTEMPTS=60
     while [ $BT_ATTEMPTS -gt 0 ]; do
       if hciconfig hci0; then
@@ -213,3 +243,17 @@ This can be useful in case of network problems.
     - `rfcomm connect hci0 RPI_ADDR &`
     - `picocom /dev/rfcomm0`
     - login as user `mon`
+
+# Dev tools
+
+  These settings are not required, but may come in handy during debugging.
+
+  - edit `/etc/locale.gen`, uncomment `en_US.UTF-8`, then run `locale-gen`
+  - `aptitude install git tig`
+  - `aptitude install vim-python-jedi`
+  - `vim-addons install python-jedi`
+  - `aptitude install fish`
+  - take vim/git/fish config from [this repo](https://github.com/pzankov/cfg)
+  - `aptitude install ipython3`
+  - `aptitude install time`
+  - `aptitude install wcalc`
