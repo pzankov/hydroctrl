@@ -236,7 +236,7 @@ Use this if you want to check syslog when network is down (and you are too lazy 
 - Connect from PC
     - allow Bluetooth usage without sudo
       - `sudo chmod u+s /usr/bin/rfcomm`
-      - `sudo apt-get remove modemmanager` (ModemManager opens /dev/rfcomm0 and interferes with minicom)
+      - `sudo apt-get remove modemmanager` (ModemManager opens `/dev/rfcomm0` and interferes with minicom)
       - check you are in the `dialout` group
     - `rfcomm connect hci0 RPI_ADDR &`
     - `minicom -D /dev/rfcomm0` (do not use `picocom` - it gets stuck sending `^J` character)
