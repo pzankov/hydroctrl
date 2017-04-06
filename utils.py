@@ -9,27 +9,33 @@ def log_init():
     syslog.openlog('hydroctrl')
 
 
-def _log(msg):
-    print(msg)
-    syslog.syslog(msg)
+def log(priority, message):
+    priority_str = {
+        syslog.LOG_INFO: 'INFO',
+        syslog.LOG_WARNING: 'WARN',
+        syslog.LOG_ERR: 'ERROR'
+    }
+    prefix = priority_str.get(priority, 'ERROR') + ': '
+    print(prefix + message)
+    syslog.syslog(priority, message)
 
 
-def log_info(msg):
-    _log('INFO: ' + msg)
+def log_info(message):
+    log(syslog.LOG_INFO, message)
 
 
-def log_warn(msg):
-    _log('WARN: ' + msg)
+def log_warn(message):
+    log(syslog.LOG_WARNING, message)
 
 
-def log_err(msg):
-    _log('ERROR: ' + msg)
+def log_err(message):
+    log(syslog.LOG_ERR, message)
 
 
 def log_exception_trace():
     fmt = traceback.format_exc()
     for l in fmt.splitlines():
-        _log('  ' + l)
+        log(syslog.LOG_INFO, '  ' + l)
 
 
 def wait_for_ntp():
