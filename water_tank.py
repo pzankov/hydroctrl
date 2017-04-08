@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from adc import ADS1115, ADCFilter
-from settings import UR, WATER_TANK_CONFIG
+from settings import UR, SUPPLY_TANK_CONFIG
 
 
 class LinearInterpolation:
@@ -31,7 +31,13 @@ class LinearInterpolation:
         y1 = self.y[i1]
         y2 = self.y[i2]
 
-        return y1 + (x_new - x1) / (x2 - x1) * (y2 - y1)
+        y_new = y1 + (x_new - x1) / (x2 - x1) * (y2 - y1)
+
+        # Pint forgets to convert Quantity with uncertainty into Measurement
+        if type(y_new) == UR.Quantity:
+            y_new = UR.Measurement(y_new.magnitude.nominal_value, y_new.magnitude.std_dev, y_new.units)
+
+        return y_new
 
 
 class PressureSensorCalibration:
@@ -39,6 +45,7 @@ class PressureSensorCalibration:
     MP3V5050DP pressure sensor calibration.
     """
 
+    # Sensitivity is constant (see Datasheet)
     sensitivity = 54 * UR.mV / UR.kPa
 
     def __init__(self, pressure_offset):
@@ -87,18 +94,28 @@ class WaterTankInterface:
     """
 
     def __init__(self, config):
-        pass
+        points = config['calibration']['points']
+        self.calibration = LinearInterpolation(
+            x=[p['pressure'] for p in points],
+            y=[p['volume'] for p in points])
+
+        self.sensor = PressureSensorInterface(config)
+
+    def get_volume_and_pressure_and_voltage(self):
+        pressure, voltage = self.sensor.get_pressure_and_voltage()
+        volume = self.calibration(pressure)
+        return volume, pressure, voltage
 
     def get_volume(self):
-        return 0 * UR.L
+        return self.get_volume_and_pressure_and_voltage()[0]
 
 
 def main():
-    tank = WaterTankInterface(WATER_TANK_CONFIG)
+    tank = WaterTankInterface(SUPPLY_TANK_CONFIG)
     while True:
         try:
-            volume = tank.get_volume()
-            print('{:~5.1fP}'.format(volume.to('L')))
+            volume, pressure, voltage = tank.get_volume_and_pressure_and_voltage()
+            print('{:~.1fP}  {:~.1fP}  {:~.1fP}'.format(voltage.to('mV'), pressure.to('cmH2O'), volume.to('L')))
         except Exception as e:
             print(e)
 
