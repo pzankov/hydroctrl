@@ -10,7 +10,9 @@ from temperature import TemperatureInterface
 from ph import PHInterface
 from pump import PumpInterface
 from solution_tank import SolutionTankInterface
-from settings import UR, CONTROLLER_CONFIG, PH_CONFIG, PUMP_CONFIG, SOLUTION_TANK_CONFIG
+from water_tank import WaterTankInterface
+from settings import UR
+from settings import CONTROLLER_CONFIG, PH_CONFIG, PUMP_CONFIG, SOLUTION_TANK_CONFIG, SUPPLY_TANK_CONFIG
 
 
 class FatalException(Exception):
@@ -26,13 +28,14 @@ class Controller:
     Controller class.
     """
 
-    def __init__(self, config, ph_config, pump_config, solution_tank_config):
+    def __init__(self, config, ph_config, pump_config, solution_tank_config, supply_tank_config):
         self.database = None
         self.thingspeak = None
         self.temperature = TemperatureInterface()
         self.ph = PHInterface(ph_config)
         self.pump = PumpInterface(pump_config)
         self.solution_tank = SolutionTankInterface(solution_tank_config)
+        self.supply_tank = WaterTankInterface(supply_tank_config)
         self.scheduler = Scheduler(config['iteration_period'], self._do_iteration_throw_only_fatal)
         self.valid_ph_range = config['valid_ph_range']
         self.valid_temperature_range = config['valid_temperature_range']
@@ -94,7 +97,7 @@ class Controller:
         if not in_range(ph, self.valid_ph_range):
             raise FatalException('Invalid pH: {:~.3gP}'.format(ph))
 
-        supply_tank_volume = 250 * UR.L
+        supply_tank_volume = self.supply_tank.get_volume().value
         if not in_range(supply_tank_volume, self.valid_supply_tank_volume_range):
             raise FatalException('Invalid supply tank volume: {:~.3gP}'.format(supply_tank_volume))
 
@@ -133,7 +136,7 @@ def main():
     log_info('Starting controller')
 
     try:
-        ctrl = Controller(CONTROLLER_CONFIG, PH_CONFIG, PUMP_CONFIG, SOLUTION_TANK_CONFIG)
+        ctrl = Controller(CONTROLLER_CONFIG, PH_CONFIG, PUMP_CONFIG, SOLUTION_TANK_CONFIG, SUPPLY_TANK_CONFIG)
         ctrl.run()
 
         log_err('Controller stopped running')
