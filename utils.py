@@ -87,3 +87,16 @@ def config_file_path(file_name):
 
 def in_range(value, range):
     return min(range) <= value <= max(range)
+
+
+def delay(secs):
+    """
+    This is more precise than time.sleep at the expense of
+    keeping CPU busy.
+    """
+
+    start = time.monotonic()
+    while secs > 0:
+        end = time.monotonic()
+        secs -= end - start
+        start = end

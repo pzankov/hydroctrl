@@ -97,12 +97,14 @@ class PHInterface:
     """
 
     def __init__(self, config):
-        self.adc = MCP3221(
+        adc = MCP3221(
             i2c_busn=config['adc']['i2c_busn'],
             i2c_addr=config['adc']['i2c_addr'],
             v_ref=config['adc']['v_ref'])
 
-        self.adc = ADCFilter(self.adc)
+        self.adc = ADCFilter(
+            adc=adc,
+            samples_count=config['adc']['filter_samples'])
 
         self.calibration = PHCalibration(
             adc_offset=config['adc']['v_off'],

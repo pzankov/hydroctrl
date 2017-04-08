@@ -22,6 +22,7 @@ PH_CONFIG = {
         'i2c_addr': 0x4F,
         'v_ref': 2.5 * UR.V,
         'v_off': 1.251 * UR.V,
+        'filter_samples': 256
     },
     'calibration': {
         'temperature': 21.2 * UR.degC,
@@ -32,7 +33,22 @@ PH_CONFIG = {
     }
 }
 
-WATER_TANK_CONFIG = {
+SUPPLY_TANK_CONFIG = {
+    'adc': {
+        'i2c_busn': 1,
+        'i2c_addr': 0x48,
+        'channel': 2,
+        'fsr': 1024 * UR.mV,
+        'sps': 64
+    },
+    'calibration': {
+        'pressure_offset': 25.9 * UR.cmH2O,
+        'points': (
+            {'pressure': 0 * UR.cmH2O, 'volume': 25 * UR.L},
+            {'pressure': 30 * UR.cmH2O, 'volume': 150 * UR.L},
+            {'pressure': 60 * UR.cmH2O, 'volume': 300 * UR.L}
+        )
+    }
 }
 
 SOLUTION_TANK_CONFIG = {
