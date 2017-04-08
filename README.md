@@ -94,15 +94,19 @@ If there are no new records appearing in the database, connect to the controller
 - Make sure peristaltic pump properly compresses the pipe in all rotor positions.
 In my case, pipe holder had to be tightened to prevent free liquid flow in some positions.
 - Easy Driver
-    - Replace pullup with a pulldown at SLEEP pin.
-    - Solder a 3.3V jumper.
-    - Adjust current to match stepper motor rating.
+  - Replace pullup with a pulldown at SLEEP pin.
+  - Solder a 3.3V jumper.
+  - Adjust current to match stepper motor rating.
 - MinipH
-    - Remove the SJ1 jumper
-    - Solder a voltage reference IC (e.g. REF3025)
-    - Solder a 3.3V jumper on the I2C opto isolation
-- Solder power supply wires directly to RPi board (Micro USB plug is not reliable).
-- Pressure sensor is ratiometric and must be supplied with a stabilized 3.0V voltage.
+  - Remove the SJ1 jumper
+  - Solder a voltage reference IC (e.g. REF3025)
+  - Solder a 3.3V jumper on the I2C opto isolation
+- Solder power supply wires directly to the RPi board (Micro USB plug is not reliable).
+- Pressure sensor
+  - MP3V5050DP sensor is ratiometric and must be supplied with a stabilized voltage.
+  - Make sure there're no air leaks in sensor piping.
+  E.g. submerge the open end of the sensor pipe in water 20..30 cm deep.
+  Pressure should not change by more than 1 cm H2O over 24 hours period.
 
 # Software setup
 
