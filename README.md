@@ -17,7 +17,7 @@ Following data is obtained by the controller:
 - temperature of solution
 - pH of solution
 - solution level (with a single float switch)
-- consumption of fresh water (to detect leaks)
+- consumption of fresh water (with a pressure sensor attached to the supply tank)
 
 # Data storage
 
@@ -58,7 +58,7 @@ If there are no new records appearing in the database, connect to the controller
 
 # Hardware
 
-- Raspberry Pi
+- Raspberry Pi 3
 - pH
   - MinipH pH interface by [Sparky's Widgets](https://www.sparkyswidgets.com/product/miniph/)
     (note: voltage reference IC has to be soldered manually)
