@@ -195,21 +195,48 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
     sudo mount -o remount,ro /
     ```
 
-- Runtime
-  - `aptitude install python3 python3-pip libffi-dev`
-  - `pip3 install -r requirements.txt`
-  - create a thingspeak channel with same fields order as in `settings.DATA_SPEC` (skip the `date` field).
-  Save the channel's write api key to `thingspeak_key.txt`.
-  - create a google spreadsheet and remove all rows but the first one.
-  Save spreadsheet ID to `google_sheet_id.txt`.
-  - obtain google credentials for [gspread](https://github.com/burnash/gspread) as described [here](http://gspread.readthedocs.io/en/latest/oauth2.html).
-  Don't forget to share the spreadsheet with the email specified in `json_key['client_email']`.
-  Save credentials to `google_key.json`.
-  - edit `/etc/rc.local`
+- Configuration
+  - Install runtime
+    - clone this repo into `/home/pi/hydroctrl`
+    - `aptitude install python3 python3-pip libffi-dev`
+    - `pip3 install -r requirements.txt`
+  - Google sheet
+    - create a google spreadsheet and remove all rows but the first one
+    - save spreadsheet ID to `google_sheet_id.txt`
+    - obtain google credentials for [gspread](https://github.com/burnash/gspread) as described [here](http://gspread.readthedocs.io/en/latest/oauth2.html).
+    Don't forget to share the spreadsheet with the email specified in `json_key['client_email']`.
+    - save credentials to `google_key.json`
+    - run `./google.py` to append a sample record
+  - Thingspeak
+    - create a Thingspeak channel with the same order of fields as in `settings.DATA_SPEC` (skip the `date` field)
+    - save the channel's write api key to `thingspeak_key.txt`
+    - run `./thingspeak.py` to append a sample record
+  - Temperature
+    - run `./temperature.py` and check that temperature sensor works
+  - pH
+    - verify `settings.PH_CONFIG`
+    - run `./ph.py` to see pH sensor status
+    - adjust calibration data
+  - Supply tank
+    - verify `settings.SUPPLY_TANK_CONFIG`
+    - run `./water_tank.py` to see pressure sensor status
+    - adjust calibration data
+  - Solution tank
+    - verify `settings.SOLUTION_TANK_CONFIG`
+    - run `./solution_tank.py` to see solution tank status
+    - check that solution tank status is affected by float switch
+  - Nutrient pump
+    - verify `settings.PUMP_CONFIG`
+    - run `./pump.py 10ml` to pump 10 ml of liquid
+    - adjust `steps_per_volume`
+  - Controller
+    - verify `settings.CONTROLLER_CONFIG`
+    - run `./controller.py` to start controller manually
+    - edit `/etc/rc.local` to start controller at boot
 
-    ```
-    su -c /home/pi/PROJECT_PATH/controller.py pi &
-    ```
+      ```
+      su -c /home/pi/PROJECT_PATH/controller.py pi &
+      ```
 
 # Bluetooth terminal
 
