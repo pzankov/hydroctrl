@@ -37,7 +37,12 @@ class TemperatureInterface:
 
 def main():
     t = TemperatureInterface()
-    print(t.get_temperature())
+    while True:
+        try:
+            temp = t.get_temperature()
+            print(temp)
+        except Exception as e:
+            print(e)
 
 
 if __name__ == '__main__':
