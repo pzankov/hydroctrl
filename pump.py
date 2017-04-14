@@ -55,9 +55,22 @@ class PumpInterface:
 
 
 def main():
-    volume_mL = float(sys.argv[1])
+    if len(sys.argv) != 2:
+        print('Usage: ./pump.py volume')
+        print('       ./pump.py 10mL')
+        return
+
+    volume = UR(sys.argv[1])
+    try:
+        volume.to('L')
+    except:
+        print('Value "{}" does not represent a volume'.format(volume))
+        return
+
     p = PumpInterface(PUMP_CONFIG)
-    p.pump(volume_mL * UR.mL)
+
+    print('Pumping {}'.format(volume))
+    p.pump(volume)
 
 
 if __name__ == '__main__':
