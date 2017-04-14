@@ -25,10 +25,10 @@ PH_CONFIG = {
         'filter_samples': 256
     },
     'calibration': {
-        'temperature': 21.2 * UR.degC,
+        'temperature': 21 * UR.degC,
         'points': (
             {'ph': 4.0 * UR.pH, 'v': 1.418 * UR.V},
-            {'ph': 7.0 * UR.pH, 'v': 1.224 * UR.V}
+            {'ph': 7.0 * UR.pH, 'v': 1.246 * UR.V}
         )
     }
 }
