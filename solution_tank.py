@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import time
 import RPi.GPIO as GPIO
 from settings import SOLUTION_TANK_CONFIG
 
@@ -27,7 +28,13 @@ class SolutionTankInterface:
 
 def main():
     t = SolutionTankInterface(SOLUTION_TANK_CONFIG)
-    print('Is full: ' + str(t.is_full()))
+    while True:
+        try:
+            is_full = t.is_full()
+            print('Is full: ' + str(is_full))
+            time.sleep(1)
+        except Exception as e:
+            print(e)
 
 
 if __name__ == '__main__':
