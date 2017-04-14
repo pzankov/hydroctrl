@@ -75,5 +75,5 @@ CONTROLLER_CONFIG = {
     'desired_ph': 6.0 * UR.pH,
     'solution_volume': 50 * UR.L,
     'proportional_k': 0.5,
-    'iteration_period': 5 * UR.min
+    'iteration_period': 15 * UR.min
 }
