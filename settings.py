@@ -42,11 +42,13 @@ SUPPLY_TANK_CONFIG = {
         'sps': 64
     },
     'calibration': {
-        'pressure_offset': 25.9 * UR.cmH2O,
+        'pressure_offset': 26.5 * UR.cmH2O,
         'points': (
             {'pressure': 0 * UR.cmH2O, 'volume': 25 * UR.L},
-            {'pressure': 30 * UR.cmH2O, 'volume': 150 * UR.L},
-            {'pressure': 60 * UR.cmH2O, 'volume': 300 * UR.L}
+            {'pressure': 5.9 * UR.cmH2O, 'volume': 50 * UR.L},
+            {'pressure': 16.3 * UR.cmH2O, 'volume': 100 * UR.L},
+            {'pressure': 36.8 * UR.cmH2O, 'volume': 200 * UR.L},
+            {'pressure': 58.7 * UR.cmH2O, 'volume': 300 * UR.L},
         )
     }
 }
