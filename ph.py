@@ -121,7 +121,7 @@ class PHInterface:
 
 
 def main():
-    temperature = TemperatureInterface()
+    temperature = TemperatureInterface(PH_CONFIG['temperature']['device_id'])
     ph = PHInterface(PH_CONFIG)
     while True:
         try:

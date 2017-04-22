@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import glob
+import os
 from os import path
 from settings import UR
 
@@ -10,14 +10,18 @@ class TemperatureInterface:
     DS18B20 interface.
     """
 
-    def __init__(self):
-        devices = glob.glob('/sys/bus/w1/devices/28-*')
-        if len(devices) == 0:
-            raise Exception('No devices found')
-        if len(devices) > 1:
-            raise Exception('Found too many devices')
+    bus_devices_path = '/sys/bus/w1/devices'
+    family_code = 0x28
 
-        self.file_path = path.join(devices[0], 'w1_slave')
+    @classmethod
+    def discover_devices(cls):
+        prefix = '{:02x}-'.format(cls.family_code)
+        bus_devices = os.listdir(cls.bus_devices_path)
+        return [x for x in bus_devices if x.startswith(prefix)]
+
+    def __init__(self, device_id):
+        self.device_id = device_id
+        self.file_path = path.join('/sys/bus/w1/devices', device_id, 'w1_slave')
         if not path.isfile(self.file_path):
             raise Exception('File %s does not exist' % self.file_path)
 
@@ -36,11 +40,16 @@ class TemperatureInterface:
 
 
 def main():
-    t = TemperatureInterface()
+    devices = TemperatureInterface.discover_devices()
+    if len(devices) == 0:
+        raise Exception('No devices found')
+
+    sensors = [TemperatureInterface(id) for id in devices]
     while True:
         try:
-            temp = t.get_temperature()
-            print(temp)
+            for s in sensors:
+                temperature = s.get_temperature()
+                print('{} {}'.format(s.device_id, temperature))
         except Exception as e:
             print(e)
 

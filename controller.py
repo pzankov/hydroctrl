@@ -31,7 +31,7 @@ class Controller:
     def __init__(self, config, ph_config, pump_config, solution_tank_config, supply_tank_config):
         self.database = None
         self.thingspeak = None
-        self.temperature = TemperatureInterface()
+        self.ph_temperature = TemperatureInterface(ph_config['temperature']['device_id'])
         self.ph = PHInterface(ph_config)
         self.pump = PumpInterface(pump_config)
         self.solution_tank = SolutionTankInterface(solution_tank_config)
@@ -89,11 +89,11 @@ class Controller:
         if not solution_tank_was_full:
             raise Exception('Solution tank has been empty for a while')
 
-        temperature = self.temperature.get_temperature()
-        if not in_range(temperature, self.valid_temperature_range):
-            raise FatalException('Invalid temperature: {:~.3gP}'.format(temperature))
+        ph_temperature = self.ph_temperature.get_temperature()
+        if not in_range(ph_temperature, self.valid_temperature_range):
+            raise FatalException('Invalid temperature: {:~.3gP}'.format(ph_temperature))
 
-        ph = self.ph.get_ph(temperature).value
+        ph = self.ph.get_ph(ph_temperature).value
         if not in_range(ph, self.valid_ph_range):
             raise FatalException('Invalid pH: {:~.3gP}'.format(ph))
 
@@ -105,7 +105,7 @@ class Controller:
 
         data = {
             'date': date.strftime('%Y-%m-%dT%H:%M:%SZ'),
-            'temperature_C': '%.1f' % temperature.m_as('degC'),
+            'temperature_C': '%.1f' % ph_temperature.m_as('degC'),
             'pH': '%.2f' % ph.m_as('pH'),
             'supply_tank_L': '%.0f' % supply_tank_volume.m_as('L'),
             'nutrients_mL': '%.1f' % nutrients.m_as('mL')
