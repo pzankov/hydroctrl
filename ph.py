@@ -111,23 +111,21 @@ class PHInterface:
             temp=config['calibration']['temperature'],
             points=config['calibration']['points'])
 
-    def get_ph_and_voltage(self, temp):
-        voltage = self.adc.get_voltage()
-        ph = self.calibration.compute_ph(temp, voltage)
-        return ph, voltage
+        self.temperature = TemperatureInterface(config['temperature']['device_id'])
 
-    def get_ph(self, temp):
-        return self.get_ph_and_voltage(temp)[0]
+    def get_t_v_ph(self):
+        temperature = self.temperature.get_temperature()
+        voltage = self.adc.get_voltage()
+        ph = self.calibration.compute_ph(temperature, voltage)
+        return temperature, voltage, ph
 
 
 def main():
-    temperature = TemperatureInterface(PH_CONFIG['temperature']['device_id'])
-    ph = PHInterface(PH_CONFIG)
+    interface = PHInterface(PH_CONFIG)
     while True:
         try:
-            temp = temperature.get_temperature()
-            ph_, voltage = ph.get_ph_and_voltage(temp)
-            print('{:~.1fP}  {:~.3fP}  {:~.2fP}'.format(temp.to('degC'), voltage.to('V'), ph_.to('pH')))
+            t, v, ph = interface.get_t_v_ph()
+            print('{:~.1fP}  {:~.3fP}  {:~.2fP}'.format(t.to('degC'), v.to('V'), ph.to('pH')))
         except Exception as e:
             print(e)
 

@@ -5,8 +5,7 @@ from google import GoogleSheet
 from thingspeak import Thingspeak
 from scheduler import Scheduler
 from utils import log_init, log_info, log_warn, log_err, log_exception_trace
-from utils import wait_for_ntp, retry, in_range
-from temperature import TemperatureInterface
+from utils import wait_for_ntp, retry, in_range, drop_uncertainty
 from ph import PHInterface
 from pump import PumpInterface
 from solution_tank import SolutionTankInterface
@@ -31,7 +30,6 @@ class Controller:
     def __init__(self, config, ph_config, pump_config, solution_tank_config, supply_tank_config):
         self.database = None
         self.thingspeak = None
-        self.ph_temperature = TemperatureInterface(ph_config['temperature']['device_id'])
         self.ph = PHInterface(ph_config)
         self.pump = PumpInterface(pump_config)
         self.solution_tank = SolutionTankInterface(solution_tank_config)
@@ -81,23 +79,21 @@ class Controller:
         solution_tank_was_full = self.solution_tank_is_full
         self.solution_tank_is_full = self.solution_tank.is_full()
 
-        # Volume is unknown and pH sensor can be dry.
+        # Volume is unknown and pH sensor can be dry
         if not self.solution_tank_is_full:
             raise Exception('Solution tank is empty')
 
-        # Skip one more iteration to let the pH readings stabilize.
+        # Skip one more iteration to let the pH readings stabilize
         if not solution_tank_was_full:
             raise Exception('Solution tank has been empty for a while')
 
-        ph_temperature = self.ph_temperature.get_temperature()
-        if not in_range(ph_temperature, self.valid_temperature_range):
-            raise FatalException('Invalid temperature: {:~.3gP}'.format(ph_temperature))
-
-        ph = self.ph.get_ph(ph_temperature).value
+        temperature, _, ph = drop_uncertainty(*self.ph.get_t_v_ph())
         if not in_range(ph, self.valid_ph_range):
             raise FatalException('Invalid pH: {:~.3gP}'.format(ph))
+        if not in_range(temperature, self.valid_temperature_range):
+            raise FatalException('Invalid temperature: {:~.3gP}'.format(temperature))
 
-        supply_tank_volume = self.supply_tank.get_volume().value
+        supply_tank_volume = drop_uncertainty(self.supply_tank.get_volume())
         if not in_range(supply_tank_volume, self.valid_supply_tank_volume_range):
             raise FatalException('Invalid supply tank volume: {:~.3gP}'.format(supply_tank_volume))
 
@@ -105,7 +101,7 @@ class Controller:
 
         data = {
             'date': date.strftime('%Y-%m-%dT%H:%M:%SZ'),
-            'temperature_C': '%.1f' % ph_temperature.m_as('degC'),
+            'temperature_C': '%.1f' % temperature.m_as('degC'),
             'pH': '%.2f' % ph.m_as('pH'),
             'supply_tank_L': '%.0f' % supply_tank_volume.m_as('L'),
             'nutrients_mL': '%.1f' % nutrients.m_as('mL')

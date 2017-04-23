@@ -100,3 +100,8 @@ def delay(secs):
         end = time.monotonic()
         secs -= end - start
         start = end
+
+
+def drop_uncertainty(*iterables):
+    out = list(map(lambda x: x.value if hasattr(x, 'value') else x, iterables))
+    return out if len(out) > 1 else out[0]
