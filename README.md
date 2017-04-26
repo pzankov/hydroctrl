@@ -111,13 +111,8 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
 # Software setup
 
 - OS installation and basic setup
-  - dd [Raspbian image](https://www.raspberrypi.org/downloads/raspbian/) to SD flash
+  - dd [Raspbian Lite](https://www.raspberrypi.org/downloads/raspbian/) to SD flash
   - create empty file `ssh` on the boot partition (enable ssh server)
-  - connect Pi to the ethernet cable and power it on
-  - discover raspberry with `arp-scan -l`
-  - connect via ssh (user `pi`, password `raspberry`)
-  - `aptitude update && aptitude upgrade`
-  - `aptitude install vim`
   - edit `/etc/wpa_supplicant/wpa_supplicant.conf` (configure WiFi)
 
     ```
@@ -127,19 +122,22 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
     }
     ```
 
-  - `raspi-config`
-    - Expand Filesystem
+  - power on
+  - discover raspberry with `arp-scan -l`
+  - connect via ssh (user `pi`, password `raspberry`)
+  - `sudo apt-get update && sudo apt-get upgrade`
+  - `sudo apt-get install vim`
+  - `sudo raspi-config`
     - Boot Options
-      - Choose Console for Desktop / CLI
-      - Disable Wait for Network at Boot
-    - Advanced Options
-      - Enable SPI
-      - Enable I2C
-  - edit `/boot/config.txt` (enable 1-Wire)
-
-    ```
-    dtoverlay=w1-gpio
-    ```
+      - Desktop / CLI
+        - Console
+      - Wait for Network at Boot
+        - No
+    - Interfacing Options
+      - I2C
+        - Yes
+      - 1-Wire
+        - Yes
 
   - edit `/etc/modprobe.d/i2c.conf` (limit I2C speed)
 
@@ -147,9 +145,11 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
     options i2c_bcm2708 baudrate=100000
     ```
 
-  - paste your public ssh key into `.ssh/authorized_keys`
-  - `usermod --lock pi` (disable login with password)
-  - `dpkg-reconfigure tzdata` (set time zone)
+  - `mkdir ~/.ssh` and paste your public ssh key into `~/.ssh/authorized_keys`.
+
+    Logout ssh and login again without password.
+  - `sudo usermod --lock pi` (disable login with password)
+  - `sudo dpkg-reconfigure tzdata` (set time zone)
   - edit `/etc/network/interfaces` (disable WiFi power management)
 
     ```
@@ -159,17 +159,34 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
         wireless-power off
     ```
 
-    Make sure power management is off after reboot (check with `iwconfig`).
+    Reboot and make sure power management is off (check with `iwconfig`).
 - Switch to readonly FS
-  - follow [these instructions](https://hallard.me/raspberry-pi-read-only/)
-  - `aptitude purge fake-hwclock`
+  - follow [these instructions](https://hallard.me/raspberry-pi-read-only/) (skip the fake-hwclock script)
+  - `sudo mount -o remount,rw /`
+  - create scripts to manually remount FS: `/usr/bin/rw`:
+
+    ```
+    #!/bin/sh
+    sudo mount -o remount,rw /
+    ```
+
+    and `/usr/bin/ro`:
+
+    ```
+    #!/bin/sh
+    sudo mount -o remount,ro /
+    ```
+
+    `sudo chmod +x /usr/bin/rw /usr/bin/ro`
+
+  - `sudo apt-get purge fake-hwclock`
   - edit `/etc/rc.local`
 
     ```
-    # fix tmpfs permissions
+    # Fix tmpfs permissions
     chmod 1777 /tmp
 
-    # fix ntp trying to create a temp file in /var/lib/ntp/
+    # Fix ntp trying to create a temp file in /var/lib/ntp/
     mkdir -p /tmp/ntpfs/upper /tmp/ntpfs/work
     mount -t overlay overlay -olowerdir=/var/lib/ntp/,upperdir=/tmp/ntpfs/upper,workdir=/tmp/ntpfs/work /var/lib/ntp
     chown ntp:ntp /var/lib/ntp
@@ -181,25 +198,12 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
     set viminfo="/tmp/viminfo"
     ```
 
-  - create scripts to manually remount FS: `/usr/bin/rw`
-
-    ```
-    #!/bin/sh
-    sudo mount -o remount,rw /
-    ```
-
-    and `/usr/bin/ro`
-
-    ```
-    #!/bin/sh
-    sudo mount -o remount,ro /
-    ```
-
 - Configuration
   - Install runtime
-    - clone this repo into `/home/pi/hydroctrl`
-    - `aptitude install python3 python3-pip libffi-dev`
-    - `pip3 install -r requirements.txt`
+    - `sudo apt-get install git python3 python3-pip libffi-dev`
+    - `git clone https://github.com/pzankov/hydroctrl.git`
+    - `sudo pip3 install -r ~/hydroctrl/requirements.txt`
+  - `cd ~/hydroctrl`
   - Google sheet
     - create a google spreadsheet and remove all rows but the first one
     - save spreadsheet ID to `google_sheet_id.txt`
@@ -231,12 +235,17 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
     - adjust `steps_per_volume`
   - Controller
     - verify `settings.CONTROLLER_CONFIG`
-    - run `./controller.py` to start controller manually
-    - edit `/etc/rc.local` to start controller at boot
+    - run `./controller.py`
+
+      An iteration has to be started every `settings.CONTROLLER_CONFIG['iteration_period']`.
+    - edit `/etc/rc.local` (start controller at boot)
 
       ```
-      su -c /home/pi/PROJECT_PATH/controller.py pi &
+      # Start controller
+      su -c /home/pi/hydroctrl/controller.py pi &
       ```
+
+    - reboot and check that controller is running with `ps aux | grep python`
 
 # Bluetooth terminal
 
@@ -244,7 +253,7 @@ RPi can be configured to provide a terminal over Bluetooth.
 Use this if you want to check syslog when network is down (and you are too lazy to solder UART).
 
 - Setup RPi
-  - `aptitude install pi-bluetooth bluez bluez-firmware`
+  - `sudo apt-get install pi-bluetooth bluez bluez-firmware`
   - edit `/etc/bluetooth/main.conf`
 
     ```
@@ -253,8 +262,8 @@ Use this if you want to check syslog when network is down (and you are too lazy 
     ```
 
   - create a special user
-    - `useradd -m mon`
-    - `passwd mon`
+    - `sudo useradd -m mon`
+    - `sudo passwd mon`
   - edit `/etc/rc.local`
 
     ```
@@ -279,20 +288,25 @@ Use this if you want to check syslog when network is down (and you are too lazy 
       - `sudo chmod u+s /usr/bin/rfcomm`
       - `sudo apt-get remove modemmanager` (ModemManager opens `/dev/rfcomm0` and interferes with minicom)
       - check you are in the `dialout` group
-    - `rfcomm connect hci0 RPI_ADDR &`
-    - `minicom -D /dev/rfcomm0` (do not use `picocom` - it gets stuck sending `^J` character)
+    - `bluetoothctl`
+      - `scan on`
+      - Hydroctrl device will appear in few seconds. Remember its address.
+      - `quit`
+    - `rfcomm connect hci0 BLUETOOTH_ADDRESS &`
+
+      Wait for message `Connected /dev/rfcomm0 to BLUETOOTH_ADDRESS on channel 1`.
+    - `minicom -D /dev/rfcomm0`
     - login as user `mon`
+    - NOTE: I currently have a bug with `^J` characters appearing when you connect to
+      the `/dev/rfcomm0` terminal. This can cause `picocom` to hang, thus I use `minicom`.
+      Could not figure out what causes this.
 
 # Dev tools
 
-  These settings are not required, but may come in handy during debugging.
+  These are my personal dev env settings.
 
-  - edit `/etc/locale.gen`, uncomment `en_US.UTF-8`, then run `locale-gen`
-  - `aptitude install git tig`
-  - `aptitude install vim-python-jedi`
+  - edit `/etc/locale.gen`, uncomment `en_US.UTF-8`, then run `sudo locale-gen`
+  - `sudo apt-get install tig fish vim-python-jedi ipython3 time wcalc`
   - `vim-addons install python-jedi`
-  - `aptitude install fish`
-  - take vim/git/fish config from [this repo](https://github.com/pzankov/cfg)
-  - `aptitude install ipython3`
-  - `aptitude install time`
-  - `aptitude install wcalc`
+  - `git clone https://github.com/pzankov/cfg.git`
+  - `./cfg/install.sh`
