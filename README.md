@@ -138,13 +138,6 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
         - Yes
       - 1-Wire
         - Yes
-
-  - edit `/etc/modprobe.d/i2c.conf` (limit I2C speed)
-
-    ```
-    options i2c_bcm2708 baudrate=100000
-    ```
-
   - `mkdir ~/.ssh` and paste your public ssh key into `~/.ssh/authorized_keys`.
 
     Logout ssh and login again without password.
