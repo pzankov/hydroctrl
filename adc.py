@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import smbus
 from utils import delay
 from statistics import mean, pstdev
