@@ -213,6 +213,7 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
   - pH
     - verify `settings.PH_CONFIG`
     - run `./ph.py` to see pH sensor status
+    - pay attention to the signal noise (see paragraph below)
     - adjust calibration data
   - Supply tank
     - verify `settings.SUPPLY_TANK_CONFIG`
@@ -239,6 +240,27 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
       ```
 
     - reboot and check that controller is running with `ps aux | grep python`
+
+# pH noise
+
+If pH signal noise is too high (greater than ±30mV), use the `oscilloscope.py` script
+to determine its source.
+
+Simply run `ph_adc_server.py` on RPi and `oscilloscope.py RPI_IP` on the host.
+You'll be able to monitor live oscillogram and spectrogram of the pH signal.
+
+If there is no distinct 50 Hz spike on the spectrogram, then most likely
+you are dealing with a high frequency common mode noise produced by the SMPS.
+pH sensor opto isolation does not completely block high frequency common mode noise. 
+
+Here is a table of noise levels obtained with different power supplies.
+Solution tank was floating with all plastic piping.
+
+Power supply type | Noise stdev
+----------------- | -----------
+Transformer, unregulated                                                  | 1 mV
+[Class I](https://en.wikipedia.org/wiki/Appliance_classes#Class_I) SMPS   | 3 mV
+[Class II](https://en.wikipedia.org/wiki/Appliance_classes#Class_II) SMPS | 30 mV
 
 # Bluetooth terminal
 
