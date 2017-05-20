@@ -246,11 +246,14 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
 If pH signal noise is too high (greater than ±30mV), use the `oscilloscope.py` script
 to determine its source.
 
-Simply run `ph_adc_server.py` on RPi and `oscilloscope.py RPI_IP` on the host.
-You'll be able to monitor live oscillogram and spectrogram of the pH signal.
+Running `oscilloscope.py` without arguments will render a [test](img/osc_test.png) signal.
 
-If there is no distinct 50 Hz spike on the spectrogram, then most likely
-you are dealing with a high frequency common mode noise produced by the SMPS.
+Run `ph_adc_server.py` on RPi and `oscilloscope.py RPI_IP` on the host
+to monitor live oscillogram and spectrogram of the pH signal.
+
+If there is no distinct [50 Hz spike](img/osc_50hz.png) on the spectrogram,
+then most likely you are dealing with a [high frequency](img/osc_high_freq.png)
+common mode noise produced by the SMPS.
 pH sensor opto isolation does not completely block high frequency common mode noise. 
 
 Here is a table of noise levels obtained with different power supplies.
