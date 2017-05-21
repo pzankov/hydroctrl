@@ -78,7 +78,7 @@ CONTROLLER_CONFIG = {
     'nutrients_concentration_per_ph': 1.65 * UR.mL / UR.L / UR.pH,
     'min_pumped_nutrients': 1 * UR.mL,
     'desired_ph': 6.0 * UR.pH,
-    'solution_volume': 50 * UR.L,
+    'solution_volume': 60 * UR.L,
     'proportional_k': 0.5,
     'iteration_period': 15 * UR.min
 }
