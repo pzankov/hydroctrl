@@ -236,7 +236,7 @@ In my case, pipe holder had to be tightened to prevent free liquid flow in some 
 
       ```
       # Start controller
-      su -c /home/pi/hydroctrl/controller.py pi &
+      sudo --user=pi PYTHONUNBUFFERED=1 /home/pi/hydroctrl/controller.py >/dev/null 2>/tmp/hydroctrl.err &
       ```
 
     - reboot and check that controller is running with `ps aux | grep python`
