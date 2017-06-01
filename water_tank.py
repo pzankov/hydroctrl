@@ -2,6 +2,8 @@
 
 from adc import ADS1115, ADCFilter
 from settings import UR, SUPPLY_TANK_CONFIG
+from temperature import TemperatureInterface
+from utils import drop_uncertainty
 
 
 class LinearInterpolation:
@@ -112,10 +114,13 @@ class WaterTankInterface:
 
 def main():
     tank = WaterTankInterface(SUPPLY_TANK_CONFIG)
+    temperature = TemperatureInterface('28-00000584bfb4')
     while True:
         try:
-            volume, pressure, voltage = tank.get_volume_and_pressure_and_voltage()
-            print('{:~.1fP}  {:~.1fP}  {:~.1fP}'.format(voltage.to('mV'), pressure.to('cmH2O'), volume.to('L')))
+            volume, pressure, voltage = drop_uncertainty(*tank.get_volume_and_pressure_and_voltage())
+            t = temperature.get_temperature()
+            print('{:.2f} degC  {:.1f} mV  {:.2f} cmH2O  {:.1f} L'.format(
+                t.m_as('degC'), voltage.m_as('mV'), pressure.m_as('cmH2O'), volume.m_as('L')))
         except Exception as e:
             print(e)
 
