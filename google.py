@@ -14,19 +14,21 @@ class GoogleSheet:
 
     Connection is recreated for each sheet access to avoid timeout issues.
 
-    A copy of sheet contents is kept in memory.
-    All values are read at object creation.
+    If keep_data is set, a copy of sheet contents will be kept in memory,
+    and previously stored values will be read at object creation.
     It takes 1 minute to obtain 20k rows on Raspberry Pi 3.
     """
 
-    def __init__(self):
+    def __init__(self, keep_data=False):
         with open(config_file_path('google_key.json')) as f:
             self.json_key = json.load(f)
 
         with open(config_file_path('google_sheet_id.txt')) as f:
             self.sheet_id = f.read().strip()
 
-        self.values = self._get_all_values()
+        self.keep_data = keep_data
+        if self.keep_data:
+            self.values = self._get_all_values()
 
     def _open_sheet(self):
         scope = ['https://spreadsheets.google.com/feeds']
@@ -41,7 +43,8 @@ class GoogleSheet:
     def _append_row(self, values):
         sheet = self._open_sheet()
         sheet.append_row(values)
-        self.values.append(values)
+        if self.keep_data:
+            self.values.append(values)
 
     def append(self, data):
         if len(data) != len(settings.DATA_SPEC):
