@@ -58,9 +58,19 @@ SOLUTION_TANK_CONFIG = {
     'float_switch_state_when_full': 0
 }
 
-PUMP_CONFIG = {
+PUMP_X_CONFIG = {
     'gpio_sleep': 17,
     'gpio_step': 27,
+    'wake_up_time': 1 * UR.ms,
+    'max_frequency': 1 * UR.Hz,
+    'step_angle': 1.8 * UR.deg,
+    'steps_per_volume': 1050 / UR.mL,
+    'microsteps': 16
+}
+
+PUMP_Y_CONFIG = {
+    'gpio_sleep': 5,
+    'gpio_step': 6,
     'wake_up_time': 1 * UR.ms,
     'max_frequency': 1 * UR.Hz,
     'step_angle': 1.8 * UR.deg,

@@ -9,9 +9,13 @@ RPi      Sensor
 9 GND    Temp GND
 7 Data   Temp DQ
 
-11 BCM17 Pump SLEEP
-13 BCM27 Pump STEP
-14 GND   Pump GND
+11 BCM17 Pump X SLEEP
+13 BCM27 Pump X STEP
+14 GND   Pump X GND
+
+29 BCM5  Pump Y SLEEP
+31 BCM6  Pump Y STEP
+30 GND   Pump Y GND
 
 15 BCM22 FloatSwitch
 25 GND   FloatSwitch

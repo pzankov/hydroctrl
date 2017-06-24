@@ -11,7 +11,8 @@ from pump import PumpInterface
 from solution_tank import SolutionTankInterface
 from water_tank import WaterTankInterface
 from settings import UR
-from settings import CONTROLLER_CONFIG, PH_CONFIG, PUMP_CONFIG, SOLUTION_TANK_CONFIG, SUPPLY_TANK_CONFIG
+from settings import CONTROLLER_CONFIG, PH_CONFIG, PUMP_X_CONFIG, PUMP_Y_CONFIG, \
+    SOLUTION_TANK_CONFIG, SUPPLY_TANK_CONFIG
 
 
 class FatalException(Exception):
@@ -27,11 +28,13 @@ class Controller:
     Controller class.
     """
 
-    def __init__(self, config, ph_config, pump_config, solution_tank_config, supply_tank_config):
+    def __init__(self, config, ph_config, pump_x_config, pump_y_config,
+                 solution_tank_config, supply_tank_config):
         self.database = None
         self.thingspeak = None
         self.ph = PHInterface(ph_config)
-        self.pump = PumpInterface(pump_config)
+        self.pump_x = PumpInterface(pump_x_config)
+        self.pump_y = PumpInterface(pump_y_config)
         self.solution_tank = SolutionTankInterface(solution_tank_config)
         self.supply_tank = WaterTankInterface(supply_tank_config)
         self.scheduler = Scheduler(config['iteration_period'], self._do_iteration_throw_only_fatal)
@@ -113,7 +116,8 @@ class Controller:
         retry(lambda: self.thingspeak.append(data), 'Thingspeak append failed', rethrow=False)
 
         # We only add nutrients after their amount was logged to DB
-        self.pump.pump(nutrients)
+        self.pump_x.pump(nutrients)
+        self.pump_y.pump(nutrients)
 
     def _do_iteration_throw_only_fatal(self):
         try:
@@ -132,7 +136,8 @@ def main():
     log_info('Starting controller')
 
     try:
-        ctrl = Controller(CONTROLLER_CONFIG, PH_CONFIG, PUMP_CONFIG, SOLUTION_TANK_CONFIG, SUPPLY_TANK_CONFIG)
+        ctrl = Controller(CONTROLLER_CONFIG, PH_CONFIG, PUMP_X_CONFIG, PUMP_Y_CONFIG,
+                          SOLUTION_TANK_CONFIG, SUPPLY_TANK_CONFIG)
         ctrl.run()
 
         log_err('Controller stopped running')

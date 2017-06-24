@@ -3,7 +3,7 @@
 import sys
 import RPi.GPIO as GPIO
 from utils import delay
-from settings import UR, PUMP_CONFIG
+from settings import UR, PUMP_X_CONFIG, PUMP_Y_CONFIG
 
 
 class PumpInterface:
@@ -67,10 +67,12 @@ def main():
         print('Value "{}" does not represent a volume'.format(volume))
         return
 
-    p = PumpInterface(PUMP_CONFIG)
+    px = PumpInterface(PUMP_X_CONFIG)
+    py = PumpInterface(PUMP_Y_CONFIG)
 
     print('Pumping {}'.format(volume))
-    p.pump(volume)
+    px.pump(volume)
+    py.pump(volume)
 
 
 if __name__ == '__main__':
