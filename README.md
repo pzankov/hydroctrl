@@ -9,6 +9,8 @@ Features:
 Photos:
 - [top cover removed](img/ctrl_top.jpg)
 - [fully assembled](img/ctrl_cover.jpg)
+- [data sample](img/graph.png)
+- [live monitoring on mobile](img/mobile.png)
 
 # Hydroponic system
 
