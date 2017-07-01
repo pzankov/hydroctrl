@@ -1,9 +1,14 @@
 # Hydroponic nutrient solution controller
 
-This is a repo of the nutrient solution controller.
-The goal is to continuously monitor and adjust the solution state.
+Features:
+- monitors solution pH and temperature
+- adjusts pH by adding nutrients
+- uploads data to the cloud (Google, Thingspeak)
+- fail-safe design
 
-NOTE: Software is not functional yet, please wait until development is finished.
+Photos:
+- [top cover removed](img/ctrl_top.jpg)
+- [fully assembled](img/ctrl_cover.jpg)
 
 # Hydroponic system
 
@@ -16,8 +21,8 @@ Solution consumed by plants is continuously replaced with a fresh water from the
 Following data is obtained by the controller:
 - temperature of solution
 - pH of solution
-- solution level (with a single float switch)
-- consumption of fresh water (with a pressure sensor attached to the supply tank)
+- solution presence (float switch)
+- fresh water level (pressure sensor at supply tank)
 
 # Data storage
 
@@ -29,7 +34,7 @@ Data from Thingspeak can be easily viewed with a mobile app.
 # Regulation
 
 In a setup where consumed solution is replaced with a fresh water it is enough to adjust pH by addition of new nutrients.
-EC value usually stays within an acceptable range and requires no control.
+Practice shows that EC value stays within an acceptable range and requires no control.
 
 This controller implements a discrete proportional regulation algorithm.
 At each iteration, a pH state of the solution is measured.
@@ -41,11 +46,10 @@ If an error happens during the initialisation stage it will lead to the program 
 
 After controller has entered the iteration loop, only a specific set of errors will
 cause the program termination (fatal errors).
-This is done to avoid denial of service in a case of transient errors, e.g. network issues.
+Transient errors like network issues will thus not result in a denial of service.
 
 A fatal error will be thrown if there is a chance that controller state can become inconsistent
-or there are other factors that can lead to a crop loss (e.g. if pH is out of a reasonable range
-or a water leak was detected).
+or there are other factors that can lead to a crop loss (e.g. if pH is out of a reasonable range).
 
 All errors are reported to syslog and can be viewed with `logread`.
 Error history will be kept in RAM until next reboot.
