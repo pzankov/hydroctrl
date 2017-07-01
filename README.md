@@ -76,7 +76,7 @@ If there are no new records appearing in the database, connect to the controller
   - ADS1115 ADC board
 - Supply
   - DC-DC step down converter 12V to 5V 5A
-  - 12V power supply
+  - 220V to 12V 3A Class I SMPS
 
 # Bus usage
 
