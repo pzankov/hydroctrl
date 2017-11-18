@@ -271,60 +271,6 @@ Transformer, unregulated                                                  | 1 mV
 [Class I](https://en.wikipedia.org/wiki/Appliance_classes#Class_I) SMPS   | 3 mV
 [Class II](https://en.wikipedia.org/wiki/Appliance_classes#Class_II) SMPS | 30 mV
 
-# Bluetooth terminal
-
-RPi can be configured to provide a terminal over Bluetooth.
-Use this if you want to check syslog when network is down (and you are too lazy to solder UART).
-
-- Setup RPi
-  - `sudo apt-get install pi-bluetooth bluez bluez-firmware`
-  - edit `/etc/bluetooth/main.conf`
-
-    ```
-    [General]
-    Name = Hydroctrl
-    ```
-
-  - create a special user
-    - `sudo useradd -m mon`
-    - `sudo passwd mon`
-  - edit `/etc/rc.local`
-
-    ```
-    # Bluetooth is not available right after reboot
-    BT_ATTEMPTS=60
-    while [ $BT_ATTEMPTS -gt 0 ]; do
-      if hciconfig hci0; then
-        hciconfig hci0 sspmode 1
-        hciconfig hci0 piscan
-        rfcomm watch /dev/rfcomm0 0 /sbin/agetty rfcomm0 linux 115200 &
-        break
-      fi
-      BT_ATTEMPTS=$((BT_ATTEMPTS-1))
-      echo "$BT_ATTEMPTS attempts left"
-      sleep 1
-    done
-    ```
-
-  - reboot
-- Connect from PC
-    - allow Bluetooth usage without sudo
-      - `sudo chmod u+s /usr/bin/rfcomm`
-      - `sudo apt-get remove modemmanager` (ModemManager opens `/dev/rfcomm0` and interferes with minicom)
-      - check you are in the `dialout` group
-    - `bluetoothctl`
-      - `scan on`
-      - Hydroctrl device will appear in few seconds. Remember its address.
-      - `quit`
-    - `rfcomm connect hci0 BLUETOOTH_ADDRESS &`
-
-      Wait for message `Connected /dev/rfcomm0 to BLUETOOTH_ADDRESS on channel 1`.
-    - `minicom -D /dev/rfcomm0`
-    - login as user `mon`
-    - NOTE: I currently have a bug with `^J` characters appearing when you connect to
-      the `/dev/rfcomm0` terminal. This can cause `picocom` to hang, thus I use `minicom`.
-      Could not figure out what causes this.
-
 # Dev tools
 
   These are my personal dev env settings.
