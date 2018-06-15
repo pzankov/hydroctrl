@@ -2,7 +2,7 @@
 
 from settings import UR, PH_CONFIG
 from adc import MCP3221, ADCFilter
-from temperature import TemperatureInterface
+from temperature import TemperatureInterface, ConstTemperatureInterface
 
 
 class PHTheory:
@@ -111,7 +111,10 @@ class PHInterface:
             temp=config['calibration']['temperature'],
             points=config['calibration']['points'])
 
-        self.temperature = TemperatureInterface(config['temperature']['device_id'])
+        if 'device_id' in config['temperature']:
+            self.temperature = TemperatureInterface(config['temperature']['device_id'])
+        else:
+            self.temperature = ConstTemperatureInterface(config['temperature']['value'])
 
     def get_t_v_ph(self):
         temperature = self.temperature.get_temperature()

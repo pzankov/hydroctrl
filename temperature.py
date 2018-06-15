@@ -39,6 +39,14 @@ class TemperatureInterface:
         return temp_C * UR.degC
 
 
+class ConstTemperatureInterface:
+    def __init__(self, value):
+        self.value = value
+
+    def get_temperature(self):
+        return self.value
+
+
 def main():
     devices = TemperatureInterface.discover_devices()
     if len(devices) == 0:

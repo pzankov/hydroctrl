@@ -18,7 +18,7 @@ DATA_SPEC = (
 
 PH_CONFIG = {
     'temperature': {
-        'device_id': '28-0316642365ff'
+        'value': 25 * UR.degC
     },
     'adc': {
         'i2c_busn': 1,
