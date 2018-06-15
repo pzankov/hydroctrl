@@ -79,7 +79,8 @@ PUMP_Y_CONFIG = {
 }
 
 CONTROLLER_CONFIG = {
-    'valid_temperature_range': (5 * UR.degC, 40 * UR.degC),
+    'temperature_device_id': '28-0517b11b28ff',
+    'valid_ph_temperature_range': (5 * UR.degC, 40 * UR.degC),
     'valid_ph_range': (4 * UR.pH, 8 * UR.pH),
     'valid_supply_tank_volume_range': (0 * UR.L, 325 * UR.L),
     'nutrients_concentration_per_ph': 1.65 * UR.mL / UR.L / UR.pH,

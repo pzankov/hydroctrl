@@ -10,6 +10,7 @@ from ph import PHInterface
 from pump import PumpInterface
 from solution_tank import SolutionTankInterface
 from water_tank import WaterTankInterface
+from temperature import TemperatureInterface
 from settings import UR
 from settings import CONTROLLER_CONFIG, PH_CONFIG, PUMP_X_CONFIG, PUMP_Y_CONFIG, \
     SOLUTION_TANK_CONFIG, SUPPLY_TANK_CONFIG
@@ -39,7 +40,7 @@ class Controller:
         self.supply_tank = WaterTankInterface(supply_tank_config)
         self.scheduler = Scheduler(config['iteration_period'], self._do_iteration_throw_only_fatal)
         self.valid_ph_range = config['valid_ph_range']
-        self.valid_temperature_range = config['valid_temperature_range']
+        self.valid_ph_temperature_range = config['valid_ph_temperature_range']
         self.valid_supply_tank_volume_range = config['valid_supply_tank_volume_range']
         self.nutrients_concentration_per_ph = config['nutrients_concentration_per_ph']
         self.min_pumped_nutrients = config['min_pumped_nutrients']
@@ -47,6 +48,8 @@ class Controller:
         self.solution_volume = config['solution_volume']
         self.proportional_k = config['proportional_k']
         self.solution_tank_is_full = True
+        if 'temperature_device_id' in config:
+            self.temperature = TemperatureInterface(config['temperature_device_id'])
 
     def run(self):
         # Synchronize clock (we don't have a RTC module)
@@ -93,8 +96,11 @@ class Controller:
         temperature, _, ph = drop_uncertainty(*self.ph.get_t_v_ph())
         if not in_range(ph, self.valid_ph_range):
             raise FatalException('Invalid pH: {:~.3gP}'.format(ph))
-        if not in_range(temperature, self.valid_temperature_range):
-            raise FatalException('Invalid temperature: {:~.3gP}'.format(temperature))
+        if not in_range(temperature, self.valid_ph_temperature_range):
+            raise FatalException('Invalid pH temperature: {:~.3gP}'.format(temperature))
+
+        if hasattr(self, 'temperature'):
+            temperature = self.temperature.get_temperature()
 
         supply_tank_volume = drop_uncertainty(self.supply_tank.get_volume())
         if not in_range(supply_tank_volume, self.valid_supply_tank_volume_range):
