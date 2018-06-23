@@ -55,24 +55,30 @@ class PumpInterface:
 
 
 def main():
-    if len(sys.argv) != 2:
-        print('Usage: ./pump.py volume')
-        print('       ./pump.py 10mL')
+    if len(sys.argv) != 3:
+        print('Usage: ./pump.py name volume')
+        print('       name     pump name, X or Y')
+        print('       volume   amount with units, e.g. 10mL')
         return
 
-    volume = UR(sys.argv[1])
+    volume = UR(sys.argv[2])
     try:
         volume.to('L')
     except:
         print('Value "{}" does not represent a volume'.format(volume))
         return
 
-    px = PumpInterface(PUMP_X_CONFIG)
-    py = PumpInterface(PUMP_Y_CONFIG)
+    name = sys.argv[1]
+    if name.upper() == 'X':
+        pump = PumpInterface(PUMP_X_CONFIG)
+    elif name.upper() == 'Y':
+        pump = PumpInterface(PUMP_Y_CONFIG)
+    else:
+        print('Invalid pump name "{}"'.format(name))
+        return
 
-    print('Pumping {}'.format(volume))
-    px.pump(volume)
-    py.pump(volume)
+    print('Pumping {} with {}'.format(volume, name))
+    pump.pump(volume)
 
 
 if __name__ == '__main__':
