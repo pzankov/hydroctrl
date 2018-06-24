@@ -43,7 +43,7 @@ class Controller:
         self.valid_ph_temperature_range = config['valid_ph_temperature_range']
         self.valid_supply_tank_volume_range = config['valid_supply_tank_volume_range']
         self.nutrients_concentration_per_ph = config['nutrients_concentration_per_ph']
-        self.min_pumped_nutrients = config['min_pumped_nutrients']
+        self.pump_volume_limits = config['pump_volume_limits']
         self.desired_ph = config['desired_ph']
         self.solution_volume = config['solution_volume']
         self.proportional_k = config['proportional_k']
@@ -71,10 +71,12 @@ class Controller:
 
         nutrients = nutrients_per_ph * ph_error * self.proportional_k
 
-        if nutrients < self.min_pumped_nutrients:
+        if nutrients < min(self.pump_volume_limits):
             return 0 * UR.L
-
-        return nutrients
+        elif nutrients > max(self.pump_volume_limits):
+            return max(self.pump_volume_limits)
+        else:
+            return nutrients
 
     def _do_iteration(self):
         log_info('Starting a new iteration')

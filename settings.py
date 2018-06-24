@@ -84,7 +84,7 @@ CONTROLLER_CONFIG = {
     'valid_ph_range': (4 * UR.pH, 8 * UR.pH),
     'valid_supply_tank_volume_range': (0 * UR.L, 325 * UR.L),
     'nutrients_concentration_per_ph': 1.65 * UR.mL / UR.L / UR.pH,
-    'min_pumped_nutrients': 2.5 * UR.mL,
+    'pump_volume_limits': (2.5 * UR.mL, 25 * UR.mL),
     'desired_ph': 6.5 * UR.pH,
     'solution_volume': 60 * UR.L,
     'proportional_k': 0.5,
