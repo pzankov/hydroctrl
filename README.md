@@ -1,8 +1,9 @@
 # Hydroponic nutrient solution controller
 
 Features:
-- monitors solution pH and temperature
+- monitors solution pH
 - adjusts pH by adding nutrients
+- monitors temperature of solution or root zone
 - uploads data to the cloud (Google, Thingspeak)
 - fail-safe design
 
@@ -21,7 +22,7 @@ Solution consumed by plants is continuously replaced with a fresh water from the
 # Sensors
 
 Following data is obtained by the controller:
-- temperature of solution
+- temperature of solution or root zone
 - pH of solution
 - solution presence (float switch)
 - fresh water level (pressure sensor at supply tank)
@@ -60,7 +61,8 @@ There is no cheap reliable way to save log in a persistent storage.
 # Monitoring
 
 Properly operating controller will submit results to the database on a strict schedule.
-If there are no new records appearing in the database, connect to the controller and check syslog for errors.
+If there are no new records appearing in the database, connect to the controller
+and check for errors in `/tmp/hydroctrl.err` and `logread`.
 
 # Hardware
 
@@ -99,6 +101,8 @@ If there are no new records appearing in the database, connect to the controller
 
 - Make sure peristaltic pump properly compresses the pipe in all rotor positions.
 In my case, pipe holder had to be tightened to prevent free liquid flow in some positions.
+- Output end of the nutrient pipe must be placed higher than nutrients level to prevent
+free flow (in case pump clamp becomes loose).
 - Easy Driver
   - Replace pullup with a pulldown at SLEEP pin.
   - Solder a 3.3V jumper.
