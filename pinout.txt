@@ -1,13 +1,13 @@
-RPi      Sensor
+RPi      Sensor       Sensor plug
 
 5 SCL    pH, pressure
 3 SDA    pH, pressure
 1 3V3    pH, pressure
 6 GND    pH, pressure
 
-1 3V3    Temp VCC
-9 GND    Temp GND
-7 Data   Temp DQ
+1 3V3    Temp VCC     3 (red)
+9 GND    Temp GND     1 (black)
+7 Data   Temp DQ      2 (yellow/white)
 
 11 BCM17 Pump X SLEEP
 13 BCM27 Pump X STEP
