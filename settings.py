@@ -18,7 +18,8 @@ DATA_SPEC = (
 
 PH_CONFIG = {
     'temperature': {
-        'value': 25 * UR.degC
+        # 'value': 25 * UR.degC
+        'device_id': '28-0517b11b28ff'
     },
     'adc': {
         'i2c_busn': 1,
@@ -28,10 +29,10 @@ PH_CONFIG = {
         'filter_samples': 256
     },
     'calibration': {
-        'temperature': 21 * UR.degC,
+        'temperature': 24 * UR.degC,
         'points': (
-            {'ph': 4.0 * UR.pH, 'v': 1.418 * UR.V},
-            {'ph': 7.0 * UR.pH, 'v': 1.246 * UR.V}
+            {'ph': 4.0 * UR.pH, 'v': 1.426 * UR.V},
+            {'ph': 7.0 * UR.pH, 'v': 1.250 * UR.V}
         )
     }
 }
@@ -79,7 +80,7 @@ PUMP_Y_CONFIG = {
 }
 
 CONTROLLER_CONFIG = {
-    'temperature_device_id': '28-01131326b0aa',
+    'temperature_device_id': '28-0517b11b28ff',
     'valid_ph_temperature_range': (5 * UR.degC, 40 * UR.degC),
     'valid_ph_range': (4 * UR.pH, 8 * UR.pH),
     'valid_supply_tank_volume_range': (0 * UR.L, 325 * UR.L),
