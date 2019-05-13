@@ -103,6 +103,7 @@ and check for errors in `/tmp/hydroctrl.err` and `logread`.
 In my case, pipe holder had to be tightened to prevent free liquid flow in some positions.
 - Output end of the nutrient pipe must be placed higher than nutrients level to prevent
 free flow (in case pump clamp becomes loose).
+- Solution in the tank must be mixed, e.g. with aquarium pump. In my case nutrients would not reach pH sensor in hours, and controller would keep pumping them.
 - Easy Driver
   - Replace pullup with a pulldown at SLEEP pin.
   - Solder a 3.3V jumper.
@@ -264,7 +265,7 @@ to monitor live oscillogram and spectrogram of the pH signal.
 If there is no distinct [50 Hz spike](img/osc_50hz.png) on the spectrogram,
 then most likely you are dealing with a [high frequency](img/osc_high_freq.png)
 common mode noise produced by the SMPS.
-pH sensor opto isolation does not completely block high frequency common mode noise. 
+pH sensor opto isolation does not completely block high frequency common mode noise.
 
 Here is a table of noise levels obtained with different power supplies.
 Solution tank was floating with all plastic piping.
